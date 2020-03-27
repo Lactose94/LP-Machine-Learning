@@ -27,7 +27,7 @@ Sucht mithilfe von regex nach den Keywords unter denen die lattice-vectors zu fi
 ```Python
 def process_content(self, config_nr: int) -> (float, array, array):
 ```
-Als Iterator implementiertes Verarbeiten der configurations. Gibt jeweils die Werte von einer Konfiguration in der Form (E, r, F) aus.
+Als Iterator implementiertes Verarbeiten der configurations. Gibt jeweils die Werte von einer Konfiguration in der Form (E, R, F) aus.
 
 --- 
 
@@ -36,11 +36,11 @@ Hat den Vorteil, dass kein Problem mit Ordnung entstehen kann.
 ### Ion:
 ```python
 class Ion:
-  self.index
-  self.position
-  self.force
-  self.nn_list # enthält Liste mit ids/indices der NN
-  self.decriptors
+  self.index: int
+  self.position: array
+  self.force: array
+  self.nn_list: list # enthält Liste mit ids/indices der NN
+  self.decriptors: array
 ```
 
 ---
@@ -62,7 +62,7 @@ Geht die Liste der NN durch und berechnet entsprechend die Deskriptoren
 ```Python
 class Configuration:
   self.energy: float
-  self.ion_list: array[Ion: Nions]
+  self.ion_list: list[Ion: Nions]
   self.cutoff: float
   self.max_n: int
 ```
@@ -71,7 +71,7 @@ class Configuration:
 ```python:
 def calc_nn(self) -> None:
 ```
-Geht Liste der Ionen durch und ruft paarweise die entsprechende function der Ionen auf.
+Geht Liste der Ionen durch und ruft paarweise die entsprechende Funktion der Ionen auf.
 
 ---
 ```python
