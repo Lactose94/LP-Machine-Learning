@@ -61,6 +61,7 @@ Geht die Liste der NN durch und berechnet entsprechend die Deskriptoren
 ### Configuration:
 ```Python
 class Configuration:
+  self.nr_ions: int
   self.energy: float
   self.ion_list: list[Ion: Nions]
   self.cutoff: float
