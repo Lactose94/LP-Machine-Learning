@@ -37,17 +37,17 @@ Diese kann ausschließlich mit einem outcar-file initialisiert werden. Tatsächl
   Nimmt als input die Schrittweite, wie viele Konfigurationen übersprungen werden sollen, gibt jedoch immer mindestens eine Konfiguration zurück.  
   Spaltet zuerst den Inhalt an der Zeile:
     
-    >  POSITION TOTAL-FORCE (eV/Angst)
-  
-  Iteriert über die entsprechende Schrittweite und verarbeitet darauf jede Konfiguration einzeln.  
-  Dazu wird zuerst nach der Zeile
+    >  POSITION TOTAL-FORCE (eV/Angst)  
+   
+   Iteriert über die entsprechende Schrittweite und verarbeitet darauf jede Konfiguration einzeln.  
+  Dazu wird zuerst nach der Zeile  
+      
+    > free energy TOTEN = ... 
     
-    > free energy TOTEN =
-    
-  gesucht und die Energie extrahiert. Falls die Zeile nicht gefunden werden kann, wird ein `RuntimeError` geworfen.  
+    gesucht und die Energie extrahiert. Falls die Zeile nicht gefunden werden kann, wird ein `RuntimeError` geworfen.    
   Anschließend wird der Text der Konfiguratition an den Linien bestend aus einem Leerzeichen und 83 mal "-" aufgespalten. Die erste davon enthält die Positions- und Kraftvektoren, welche Zeilenweise in floats und dann in numpy arrays umgewandelt und anschließend als Positionen und Kräfte getrennt in arrays gespeichert werden.  
-  Sollte dabei die shape der Kräfte nicht mit der der Positionen übereinstimmen, wird eine `RuntimeError` geworfen.
-  Schließlich werden diese drei Werte als Tupel zurück gegeben in der Form *(E, Positionen, Kräfte)*.
+  Sollte dabei die shape der Kräfte nicht mit der der Positionen übereinstimmen, wird eine `RuntimeError` geworfen.  
+  Schließlich werden diese drei Werte als Tupel zurück gegeben in der Form *(E, Positionen, Kräfte)*.  
   
   ### Tests:
   Führt man das File einzeln aus, werden nacheinander kleinere Assertions überprüft und anschließend über alle Konfigurationen des Beispielfiles iteriert und auf dem Bildschirm ausgegeben. Sollte in Zukunft noch durch ein vernünftiges Testframework ersetzt werden.
