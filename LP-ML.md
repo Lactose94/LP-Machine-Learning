@@ -47,7 +47,7 @@ class Ion:
 #### Methoden:
 ---
 ```python
-def check_nn(self, ion: Ions, cutoff: float) -> None:
+def check_nn(self, ion: Ions, cutoff: float) -> bool:
 ```
 prüft ob der Abstand zum Ianderen on kleiner als der cutoff ist. Falls ja, wird für beide der Index des jeweils anderen als nächster Nachbar eingetragen.
 
