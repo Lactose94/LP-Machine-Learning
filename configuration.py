@@ -20,14 +20,19 @@ class Configuration(object):
         
         # Diese Funktion erstellt die nearest-neighbour-tables für die Indizes und die Abstände.
         # Dafür muss die float-Variable rcut in Angström übergeben werden.
-        def init_nn(self, rcut):
-            pass
+    def init_nn(self, rcut):
+        pass
         
-        # Diese Funktion erstellt die descriptor coefficients der configuration.
-        # Dafür muss ein float-Vektor q übergeben werden.
-        # Dass dieser mit rcut zusammenpasst wird vorausgesetzt und nicht weiter überprüft.
-        def init_descriptor(self, q):
-            if self.nndistances is None or self.nnindices is None:
-                print("Execute Configuration.init_nn(rcut) before calculating descriptor coefficients!")
-                return
-            pass
+    # Diese Funktion erstellt die descriptor coefficients der configuration.
+    # Dafür muss ein float-Vektor q übergeben werden.
+    # Dass dieser mit rcut zusammenpasst wird vorausgesetzt und nicht weiter überprüft.
+    def init_descriptor(self, q):
+        if self.nndistances is None or self.nnindices is None:
+            print("Execute Configuration.init_nn(rcut) before calculating descriptor coefficients!")
+            return
+        pass
+            
+if __name__ == '__main__':
+    config1 = Configuration([0,0,0])
+    config1.init_nn(4)
+    config1.init_descriptor([1,2,4])
