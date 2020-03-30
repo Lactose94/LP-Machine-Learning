@@ -52,4 +52,44 @@ Diese kann ausschließlich mit einem outcar-file initialisiert werden. Tatsächl
   ### Tests:
   Führt man das File einzeln aus, werden nacheinander kleinere Assertions überprüft und anschließend über alle Konfigurationen des Beispielfiles iteriert und auf dem Bildschirm ausgegeben. Sollte in Zukunft noch durch ein vernünftiges Testframework ersetzt werden.
   
-  ---
+---
+## Configurations
+Dieses Package dient dazu die einzelnen Konfigurationen der Ionen zu speichern, und zu verarbeiten. Es beinhaltet die Configurations-Klasse, dessen Instanzen je eine Ionen-Konfiguration und ihre Eigenschaften darstellen.
+
+
+# In dieser Konfiguration ist ihre Energie, sowie die Positionen, und Kräfte der einzelnen Ionen hinterlegt.
+# Durch die klasseneigene Methode init_nn können unter Angabe eines cutoff radius rcut ein nearest-neighbour-table
+# für sowohl die Indizes der NN als auch die Abstände zu diesen erstellt werden.
+# Durch die klasseneigene Methode init_descriptor können unter Angabe eines q-Vektors (dieser bestimmt die
+# Koeffizienten in den Basis-Sinusfunktionen) danach die descriptor coefficients erstellt werden.
+
+---
+**Achtung**: 
+Das Programm überprüft nicht die Plausibilität der Eingabedaten. Diese werden als richtig vorausgesetzt.
+
+---
+Das Package enthält im Wesentlichen eine Klasse: 
+### Die Configuration Klasse:
+Diese muss zumindest mit einer Positions-Matrix der Ionen initialisiert werden. Energie und Kräfte-Matrix sind optional, da diese nicht zwingend bekannt sind. Es ist auch möglich die nearesr-neigbour-tables der Indizes und der Abstände gleich zu initialisieren, falls dies erwünscht ist. Die Klasse besitzt jedoch Methoden diese selbst zu berechnen. Dies gilt ebenso für die Descriptor-Koeffizienten.
+#### Variablen:
+- `positions` enthält die Positionsmatrix der Ionen [Ionenindex, Raumkoordinatenindex] als numpy-array(float).
+- `energy` enthält die Energie der Konfiguration als float.
+- `forces` enthält die Kräftematrix der Ionen [Ionenindex, Raumkoordinatenindex] als numpy-array(float).
+- `nnindices` enthält die nearest-neighbour-Indexmatrix der Ionen als list(list(integer)).
+- `nndistances` enthält die nearest-neighbour-Abständematrix der Ionen als list(list(float)).
+- `descriptors` enthält die descriptor-Koeffizientenmatrix der Ionen [Ionenindex, qindex] als numpy-array(float).
+
+#### Methoden:
+- **init_NN(rcut)**:  
+  Erstellt unter Übergabe eines cutoff-Radius rcut (float in Angstrom) die beiden konfigurationseigenen nearest-neighbour-tables nnindices und nndistances. Dass der cutoff-Radius sinnvoll mit der Positionsmatrix zusammenpasst wird dabei vorausgesetzt und nicht überprüft.
+- **init_descriptor(q)**:  
+  Erstellt unter Übergabe eines q-Vektors (float) die descriptor-Koeffizientenmatrix. Dass der cutoff-Radius sinnvoll mit dem q-Vektor zusammenpasst wird dabei vorausgesetzt und nicht überprüft. Der descriptor-Koeffizient C_i für ein Ion i berechnet sich dabei wie folgt:
+  
+    > C_i(q) = sum_j sin(q * |r_i - r_j|)
+  
+  Daber sind r_i und r_j die Positionsvektoren der Atome i und j, und C_i ein Vektor der gleichen Länge wie der Vektor q.
+  
+### Tests:
+Tests für dieses Package sind vorgesehen, wurden jedoch noch nicht spezifiziert.
+
+---
