@@ -56,13 +56,6 @@ Diese kann ausschließlich mit einem outcar-file initialisiert werden. Tatsächl
 ## Configurations
 Dieses Package dient dazu die einzelnen Konfigurationen der Ionen zu speichern, und zu verarbeiten. Es beinhaltet die Configurations-Klasse, dessen Instanzen je eine Ionen-Konfiguration und ihre Eigenschaften darstellen.
 
-
-# In dieser Konfiguration ist ihre Energie, sowie die Positionen, und Kräfte der einzelnen Ionen hinterlegt.
-# Durch die klasseneigene Methode init_nn können unter Angabe eines cutoff radius rcut ein nearest-neighbour-table
-# für sowohl die Indizes der NN als auch die Abstände zu diesen erstellt werden.
-# Durch die klasseneigene Methode init_descriptor können unter Angabe eines q-Vektors (dieser bestimmt die
-# Koeffizienten in den Basis-Sinusfunktionen) danach die descriptor coefficients erstellt werden.
-
 ---
 **Achtung**: 
 Das Programm überprüft nicht die Plausibilität der Eingabedaten. Diese werden als richtig vorausgesetzt.
@@ -87,7 +80,7 @@ Diese muss zumindest mit einer Positions-Matrix der Ionen initialisiert werden. 
   
     > C_i(q) = sum_j sin(q * |r_i - r_j|)
   
-  Daber sind r_i und r_j die Positionsvektoren der Atome i und j, und C_i ein Vektor der gleichen Länge wie der Vektor q.
+  Dabei sind r_i und r_j die Positionsvektoren der Atome i und j, und C_i ein Vektor der gleichen Länge wie der Vektor q.
   
 ### Tests:
 Tests für dieses Package sind vorgesehen, wurden jedoch noch nicht spezifiziert.
