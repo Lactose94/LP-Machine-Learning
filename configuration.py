@@ -14,9 +14,9 @@ class Configuration(object):
         self.positions = positions
         self.energy = energy
         self.forces = forces
-        self.nnindices = None
-        self.nndistances = None
-        self.descriptors = None
+        self.nnindices = nnindices
+        self.nndistances = nndistances
+        self.descriptors = descriptors
         
         # Diese Funktion erstellt die nearest-neighbour-tables für die Indizes und die Abstände.
         # Dafür muss die float-Variable rcut in Angström übergeben werden.
