@@ -7,6 +7,9 @@
 
 class Configuration(object):
     
+    # Es wäre gut, wenn wir beim parser die Reihenfolge (positions, energy, forces) verwenden würden,
+    # da wir nur bei der Kalibration alle 3 haben. Bei der Anwendung hätten wir nur mehr Positions
+    # (daher energy und forces in der Klasse configurations mit None).
     def __init__(self, positions, energy=None, forces=None, nnindices = None, nndistances = None, descriptors = None):
         self.positions = positions
         self.energy = energy
