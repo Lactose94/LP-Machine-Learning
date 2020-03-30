@@ -18,8 +18,8 @@ class Configuration(object):
         self.nndistances = nndistances
         self.descriptors = descriptors
         
-        # Diese Funktion erstellt die nearest-neighbour-tables für die Indizes und die Abstände.
-        # Dafür muss die float-Variable rcut in Angström übergeben werden.
+    # Diese Funktion erstellt die nearest-neighbour-tables für die Indizes und die Abstände.
+    # Dafür muss die float-Variable rcut in Angström übergeben werden.
     def init_nn(self, rcut):
         pass
         
