@@ -1,0 +1,8 @@
+{
+    "stepsize": 1,
+    "cutoff_radius": 4e-10,
+    "nr_of_qs": 8,
+    "sigma": 4,
+    "lambda": 1e-4,
+    "regression_type": "linear"
+}
