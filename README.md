@@ -1,7 +1,7 @@
 # LP-Machine-Learning
 Laborpraktikum Machine Learning ML_LiqiudSI.  
 Das Programm besteht im wesentlichen aus den folgenden Packages:
-## Parser
+## outcar_parser
 Der Parser dient dazu das outcar-file zu laden und so zu verarbeiten, dass Ionenzahl, direkte Gittervektoren, sowie Positionen und Kräfte ausgelesen und vom Hauptprogramm weiterverarbeitet werden können.
 
 ---
