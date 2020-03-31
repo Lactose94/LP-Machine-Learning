@@ -50,6 +50,9 @@ Diese kann ausschließlich mit einem outcar-file initialisiert werden. Tatsächl
   Schließlich werden diese drei Werte als Tupel zurück gegeben in der Form *(E, Positionen, Kräfte)*.  
   
   ### Tests:
-  Führt man das File einzeln aus, werden nacheinander kleinere Assertions überprüft und anschließend über alle Konfigurationen des Beispielfiles iteriert und auf dem Bildschirm ausgegeben. Sollte in Zukunft noch durch ein vernünftiges Testframework ersetzt werden.
+  Tests können aufgerufen werden durch  
+  ```bash
+  python -m unittest -v tests.py
+  ```
   
   ---
