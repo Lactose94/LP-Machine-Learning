@@ -85,6 +85,12 @@ class Parser:
             else:
                 yield (energy, positions, forces)
 
+    # private Hilfsfunktion die Listen von str in Listen von floats umwandelt
+    def __convert_list(self, val_list) -> list: 
+        return list(map(lambda entry: float(entry.strip()), val_list))
+
+
+        
 if __name__ == '__main__':  
     test_in = 'OUTCAR.21'
 
