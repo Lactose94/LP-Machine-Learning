@@ -1,5 +1,5 @@
 from re import match, search, IGNORECASE
-from numpy import array, shape, fromstring, array_equal
+from numpy import array, shape, fromstring, array_equal, eye, inner
 
 
 # Hier werden die patterns und Textbausteine gespeichert, nach denen später das File durchsucht oder aufgespalten wird
@@ -48,7 +48,12 @@ class Parser:
             
         matches = lattice_match.groups()
         lattice_string = list(map(lambda vec_string: vec_string.strip().split(), matches))
-        lattice_float = list(map(lambda list_vecs: self.__convert_list(list_vecs), lattice_string))
+        lattice_float = array(list(map(lambda list_vecs: self.__convert_list(list_vecs), lattice_string)))
+
+        product_mat = lattice_float.dot(lattice_float.T)
+        compare_mat = inner(lattice_float[:, 0], lattice_float[:, 0]) * eye(3,3)
+        if not array_equal(product_mat, compare_mat):
+            print(f'*************WARNING*************\nThe given lattice vectors\n{lattice_float}\n do not constitute a simple basic lattice.\n The programm wont work correctly')
 
         return array(lattice_float)
 
@@ -100,7 +105,5 @@ if __name__ == '__main__':
     assert array_equal(parser.find_lattice_vectors(), test_lattice), 'lattice vectors do not match'
 
     # TODO: write test for reading of pos + forces
-    i = 1
-    for config in parser.build_configurations(1):
-        print(config[0], i)
-        i += 1
+    wrong_parser = Parser('wrong_data_outcar.21')
+    wrong_parser.find_lattice_vectors()
