@@ -1,6 +1,7 @@
 import unittest
-from outcar_parser import Parser
 from numpy import array, array_equal
+from outcar_parser import Parser
+
 class TestParser(unittest.TestCase):
 
     def test_file_opening(self):
@@ -11,7 +12,7 @@ class TestParser(unittest.TestCase):
         self.assertIsNotNone(correct_parser.outcar_content)
 
 
-    def test_file_not_opening(self):        
+    def test_file_not_opening(self):
         wrong_path = 'mydata.21'
 
         with self.assertRaises(ValueError):
@@ -23,28 +24,32 @@ class TestParser(unittest.TestCase):
         parser = Parser(test_in)
         nr_ions = parser.find_ion_nr()
         self.assertIsInstance(nr_ions, int)
-        self.assertEqual(nr_ions, 64,  f'nr of ions should be 64, is {nr_ions}')
+        self.assertEqual(nr_ions, 64, f'nr of ions should be 64, is {nr_ions}')
 
 
     def test_read_lattice_vecors(self):
         test_in = 'OUTCAR.21'
         parser = Parser(test_in)
         test_lattice = array([
-                            [10.546640000 , 0.000000000,  0.000000000], 
-                            [0.000000000, 10.546640000,  0.000000000], 
-                            [0.000000000,  0.000000000, 10.546640000]
-                            ])
-                
-        self.assertTrue(array_equal(parser.find_lattice_vectors(), test_lattice), 'lattice vectors do not match')
+            [10.546640000, 0.000000000, 0.000000000],
+            [0.000000000, 10.546640000, 0.000000000],
+            [0.000000000, 0.000000000, 10.546640000]
+            ])
+
+        self.assertTrue(
+            array_equal(parser.find_lattice_vectors(), test_lattice), 'lattice vectors do not match'
+            )
 
 
     def test_warn_not_cubic(self):
         import sys
         from io import StringIO
 
-        warn_message =  '*************WARNING*************\nThe given lattice vectors\n' \
-                        '[[10.       0.       0.     ]\n [ 0.      10.54664  0.     ]\n [ 0.       0.      10.54664]]\n' \
-                        ' do not constitute a simple basic lattice.\n The programm wont work correctly'
+        warn_message = '*************WARNING*************\nThe given lattice vectors\n' \
+                       '[[10.       0.       0.     ]\n [ 0.      10.54664  0.     ]\n' \
+                       '[ 0.       0.      10.54664]]\n' \
+                       'do not constitute a simple basic lattice.\n' \
+                       'The programm wont work correctly'
 
         wrong_parser = Parser('wrong_data_outcar.21')
 
@@ -61,8 +66,8 @@ class TestParser(unittest.TestCase):
 
     def test_read_pos_force_energy(self):
         test_in = 'OUTCAR.21'
-        
-        g_pos = array([ 2.26725, 2.36995, 0.06367 ])
+
+        g_pos = array([2.26725, 2.36995, 0.06367])
         g_force = array([-0.171492, -0.290427, -1.773642])
         g_energy = -306.41169589
 
