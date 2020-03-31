@@ -88,24 +88,3 @@ class Parser:
     # private Hilfsfunktion die Listen von str in Listen von floats umwandelt
     def __convert_list(self, val_list) -> list: 
         return list(map(lambda entry: float(entry.strip()), val_list))
-
-
-        
-if __name__ == '__main__':  
-    test_in = 'OUTCAR.21'
-
-    test_lattice = array([
-                        [10.546640000 , 0.000000000,  0.000000000], 
-                        [0.000000000, 10.546640000,  0.000000000], 
-                        [0.000000000,  0.000000000, 10.546640000]
-                        ])
-            
-    parser = Parser(test_in)
-    nr_ions = parser.find_ion_nr()
-    assert type(nr_ions) == int, f'nr of ions should be integer, is {type(nr_ions)}'
-    assert nr_ions == 64, f'nr of ions should be 64, is {nr_ions}'
-    assert array_equal(parser.find_lattice_vectors(), test_lattice), 'lattice vectors do not match'
-
-    # TODO: write test for reading of pos + forces
-    wrong_parser = Parser('wrong_data_outcar.21')
-    wrong_parser.find_lattice_vectors()
