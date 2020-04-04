@@ -44,7 +44,7 @@ class TestParser(unittest.TestCase):
 
         warn_message = '*************WARNING*************\nThe given lattice vectors\n' \
                        '[[10.       0.       0.     ]\n [ 0.      10.54664  0.     ]\n' \
-                       '[ 0.       0.      10.54664]]\n' \
+                       ' [ 0.       0.      10.54664]]\n' \
                        'do not constitute a simple basic lattice.\n' \
                        'The programm wont work correctly'
 
