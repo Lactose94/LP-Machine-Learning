@@ -1,5 +1,5 @@
 from re import match, search, IGNORECASE
-from numpy import array, shape, fromstring, array_equal
+from numpy import array, shape, fromstring, array_equal, eye, inner
 
 
 # Hier werden die patterns und Textbausteine gespeichert, nach denen später das File durchsucht oder aufgespalten wird
@@ -48,7 +48,12 @@ class Parser:
             
         matches = lattice_match.groups()
         lattice_string = list(map(lambda vec_string: vec_string.strip().split(), matches))
-        lattice_float = list(map(lambda list_vecs: self.__convert_list(list_vecs), lattice_string))
+        lattice_float = array(list(map(lambda list_vecs: self.__convert_list(list_vecs), lattice_string)))
+
+        product_mat = lattice_float.dot(lattice_float.T)
+        compare_mat = inner(lattice_float[:, 0], lattice_float[:, 0]) * eye(3,3)
+        if not array_equal(product_mat, compare_mat):
+            print(f'*************WARNING*************\nThe given lattice vectors\n{lattice_float}\n do not constitute a simple basic lattice.\n The programm wont work correctly')
 
         return array(lattice_float)
 
@@ -83,24 +88,3 @@ class Parser:
     # private Hilfsfunktion die Listen von str in Listen von floats umwandelt
     def __convert_list(self, val_list) -> list: 
         return list(map(lambda entry: float(entry.strip()), val_list))
-
-if __name__ == '__main__':  
-    test_in = 'OUTCAR.21'
-
-    test_lattice = array([
-                        [10.546640000 , 0.000000000,  0.000000000], 
-                        [0.000000000, 10.546640000,  0.000000000], 
-                        [0.000000000,  0.000000000, 10.546640000]
-                        ])
-            
-    parser = Parser(test_in)
-    nr_ions = parser.find_ion_nr()
-    assert type(nr_ions) == int, f'nr of ions should be integer, is {type(nr_ions)}'
-    assert nr_ions == 64, f'nr of ions should be 64, is {nr_ions}'
-    assert array_equal(parser.find_lattice_vectors(), test_lattice), 'lattice vectors do not match'
-
-    # TODO: write test for reading of pos + forces
-    i = 1
-    for config in parser.build_configurations(1):
-        print(config[0], i)
-        i += 1
