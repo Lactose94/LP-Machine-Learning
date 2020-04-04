@@ -1,6 +1,8 @@
 import json
 from math import pi, exp
 import numpy as np
+from outcar_parser import Parser
+from configuration import Configuration
 
 
 def linear_kernel(descriptor1: array, descriptor2: array) -> float:
@@ -31,4 +33,17 @@ if __name__ == '__main__':
         range(1, user_config['nr_modi"']+1)
         ))
 
-    
+    parser = Parser(user_config['file_in'])
+
+    user_config['ion_nr'] = parser.find_ion_nr()
+
+    user_config['lattice_vectors'] = parser.find_lattice_vectors()
+
+    configurations = [
+        Configuration(position, energy, force) for (energy, position, force) in parser
+            .build_configurations(user_config['stepsize'])
+    ]
+
+    for config in configurations:
+        config.init_nn(user_config['cutoff'])
+        config.init_descriptor(user_config['q'])
