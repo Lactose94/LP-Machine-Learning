@@ -35,8 +35,9 @@ def main():
     user_config['q'] = np.array(list(map(
         lambda n: n * pi / user_config['cutoff'],
         range(1, user_config['nr_modi"']+1)
-        )))
+    )))
 
+    # TODO: check if lattice constant is bigger than rcut/2
     # check if the kernel is implemented
     mode = user_config['kernel']
     if mode not in MODI:
@@ -46,7 +47,7 @@ def main():
     if mode == 'linear':
         kernel = linear_kernel
     elif mode == 'gaussian':
-        kernel = lambda x, y: gaussian_kernel(x, y, user_config['sigma'])
+        def kernel(x, y): return gaussian_kernel(x, y, user_config['sigma'])
 
     # load parser and save nr of ions and lattice vectors
     parser = Parser(user_config['file_in'])
@@ -56,7 +57,7 @@ def main():
     # build the configurations from the parser
     configurations = [
         Configuration(position, energy, force) for (energy, position, force) in parser
-                .build_configurations(user_config['stepsize'])
+        .build_configurations(user_config['stepsize'])
     ]
 
     # calculate the nearest neighbors and the descriptors
@@ -64,6 +65,6 @@ def main():
         config.init_nn(user_config['cutoff'])
         config.init_descriptor(user_config['q'])
 
-
+    # hier zum testen
 if __name__ == '__main__':
     main()
