@@ -96,3 +96,4 @@ Der Benutzer legt dabei die Parameter des Machine Learnings durch einträge in d
 - `nr_modi`: Gibt an, welche Länge die Descriptor-Vektoren haben sollen.
 - `lambda`: Parameter, welcher für die Ridge-Regression genutzt werden soll.
 - `Kernel`: Welcher Kernel für die Entwicklung der lokalen Energie genutzt werden sollen. Bisher werden nur `linear` und `gaussian` unterstützt. Falls letzters gewählt wird, muss auch der Parameter `sigma` für die Breite des Gaussian angegeben werden.
+jetzt sind wir nicht mehr in sync
