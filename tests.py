@@ -82,5 +82,12 @@ class TestParser(unittest.TestCase):
 
 class TestCalibration(unittest.TestCase):
 
-    def test_read_json(self):
+    def test_build_q(self):
         pass
+
+    def test_kernel(self):
+        pass
+
+    def test_cutoff_to_big(self):
+        pass
+
