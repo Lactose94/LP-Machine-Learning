@@ -6,7 +6,12 @@
 # Koeffizienten in den Basis-Sinusfunktionen) danach die descriptor coefficients erstellt werden.
 
 import numpy as np
-from math import sqrt, sin
+
+def dist(r1, r2, a=1):
+    dr = r2 - r1
+    dr = dr - a * np.rint(dr/a) # rint = rounding to nearest integer (up or down)
+    magnitude = np.sqrt(dr.dot(dr))
+    return magnitude
 
 class Configuration(object):
     
@@ -23,8 +28,22 @@ class Configuration(object):
         
     # Diese Funktion erstellt die nearest-neighbour-tables für die Positionen und die Abstände.
     # Dafür muss die float-Variable rcut in Angström übergeben werden.
-    def init_nn(self, rcut):
-        pass
+    def init_nn(self, rcut, lattice):
+        n = np.shape(self.positions)[0]
+        self.nnpositions = [[] for i in range(n)] # n lists of variable length inside a list
+        self.nndistances = [[] for i in range(n)] # n lists of variable length inside a list
+        
+        # get a vector of all lattice constants (primitive orthorhombic or cubic cell)
+        a = lattice.diagonal()
+            
+        for i in range(n): # loop over central atoms
+            for j in range(i+1,n): # loop over possible nearest neighbours
+                dr = dist(self.positions[i,:], self.positions[j,:], a)
+                if dr < rcut:
+                    self.nnpositions[i].append(self.positions[j,:])
+                    self.nnpositions[j].append(self.positions[i,:])
+                    self.nndistances[i].append(dr)
+                    self.nndistances[j].append(dr)
         
     # Diese Funktion erstellt die descriptor coefficients der configuration.
     # Dafür muss ein float-Vektor q übergeben werden.
@@ -41,34 +60,28 @@ class Configuration(object):
                 nrnn = np.size(self.nndistances[i]) # number of nearest neighbours for atom i
                 for j in range(0,n): # loop over q
                     for k in range(0,nrnn): # loop over nearest neighbours of atom i
-                        self.descriptors[i,j] += sin(q[j] * self.nndistances[i][k])
+                        self.descriptors[i,j] += np.sin(q[j] * self.nndistances[i][k])
         return
             
 if __name__ == '__main__':
     
-    q = [4,2,1]
-    rcut = 2
+    rcut = 4
+    q = [np.pi/rcut,2*np.pi/rcut,3*np.pi/rcut]
+    lattice = np.array([[10.0 ,  0.0],
+                        [0.0 , 10.0]])
+    positions = np.array([[1.0 , 1.0], # hat 3 NN
+                          [1.0 , 9.0], # hat 2 NN
+                          [3.0 , 3.0], # hat 1 NN
+                          [9.0 , 9.0]]) # hat 2 NN
     
     # test __init__
-    positions = np.array([[1 , 1], # hat keine NN
-                          [7 , 9], # hat 1 NN
-                          [8 , 8], # hat 2 NN
-                          [9 , 7]]) # hat 1 NN
     config1 = Configuration(positions)
-    config1.init_nn(rcut)
-    config1.init_descriptor(q)
     
     # test init_nn
+    config1.init_nn(rcut, lattice)
+    print(config1.nnpositions)
+    print(config1.nndistances)
     
     # test init_descriptor
-    nndistances = [[], 
-                   [sqrt(2)], 
-                   [sqrt(2) , sqrt(2)], 
-                   [sqrt(2)]]
-    nnpositions = [[], 
-                   [[8 , 8]], 
-                   [[7 , 9] , [9 , 7]], 
-                   [[8 , 8]]]
-    config3 = Configuration(positions, None, None, nnpositions, nndistances, None)
-    config3.init_descriptor(q)
-    print(config3.descriptors)
+    config1.init_descriptor(q)
+    print(config1.descriptors)
