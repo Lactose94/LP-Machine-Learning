@@ -32,10 +32,10 @@ def main():
         user_config = json.load(u_conf)
 
     # make a lsit of the allowed qs
-    user_config['q'] = list(map(
+    user_config['q'] = np.array(list(map(
         lambda n: n * pi / user_config['cutoff'],
         range(1, user_config['nr_modi"']+1)
-        ))
+        )))
 
     # check if the kernel is implemented
     mode = user_config['kernel']
