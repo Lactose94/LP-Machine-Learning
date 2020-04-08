@@ -65,6 +65,5 @@ def main():
         config.init_nn(user_config['cutoff'])
         config.init_descriptor(user_config['q'])
 
-    # hier zum testen
 if __name__ == '__main__':
     main()
