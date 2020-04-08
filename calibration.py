@@ -37,7 +37,6 @@ def main():
         range(1, user_config['nr_modi"']+1)
     )))
 
-    # TODO: check if lattice constant is bigger than rcut/2
     # check if the kernel is implemented
     mode = user_config['kernel']
     if mode not in MODI:
@@ -54,6 +53,11 @@ def main():
     user_config['ion_nr'] = parser.find_ion_nr()
     user_config['lattice_vectors'] = parser.find_lattice_vectors()
 
+    # TODO: check if lattice constant is bigger than 2 rcut
+    lat_consts = np.array(np.linalg.norm(vec) for vec in user_config['lattice_vectors'])
+    if any(2 * user_config['cutoff'] > lat_consts):
+        raise ValueError('Cutoff cannot be bigger than half the lattice constants')
+    
     # build the configurations from the parser
     configurations = [
         Configuration(position, energy, force) for (energy, position, force) in parser
