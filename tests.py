@@ -87,7 +87,7 @@ class TestCalibration(unittest.TestCase):
         pass
     
     # Test if the program panics if the cutoff is bigger than a/2
-    def test_cutoff_to_big(self):
+    def test_cutoff_too_big(self):
         pass
 
 
@@ -103,4 +103,8 @@ class TestKernel(unittest.TestCase):
     
     # tests if the shape and value of the matrix element is the expected
     def test_matrix_element(self):
+        pass
+    
+    # tests if the shape and value of the subrow is correct
+    def test_subrow(self):
         pass
