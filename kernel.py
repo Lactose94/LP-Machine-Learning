@@ -25,4 +25,7 @@ class Kernel:
             self.kernel = lambda x, y: gaussian_kernel(x, y, args[0])
         else: 
             raise ValueError(f'kernel {mode} is not supported')
-
+    
+    # builds a matrix-element for a given configuration and !!one!! given descriptor vector (i.e. for !!one!! atom)
+    def matrix_element(self, config: configuration, descriptors: np.array) -> float:
+        return np.sum(self.kernel(config.desciptors, descriptors))
