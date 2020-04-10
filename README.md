@@ -107,3 +107,4 @@ Dieses Package versucht die wesentlichen Funktionalitäten des Kernels zu fokuss
 Diese dient als wrapper um die übrigen Funktionalität dem User gebündelt zur Verfügung zu stellen
 ## Variablen:
 - `kernel`: Enthält den gewünschten Kernel als Funktion.
+- `matrix_element`: supply a set of descriptors for a configuration and **one element** of the set of **all** available configuration (vectors) and retrieve the corresponding matrix-element wrt the given kernel.
