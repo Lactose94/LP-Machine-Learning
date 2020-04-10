@@ -32,8 +32,16 @@ class Kernel:
     # builds a matrix-element for a given configuration and !!one!! given descriptor vector (i.e. for !!one!! atom)
     def matrix_element(self, config: configuration, descriptor: np.array) -> float:
         return sum(
-            np.apply_along_axis(lambda x: self.kernel(config.descriptors, x), arr=descriptor, axis=1)
+            np.apply_along_axis(
+                lambda x: self.kernel(config.descriptors, x),
+                arr=descriptor,
+                axis=1)
         )
 
+    # builds part of the row of the kernel matrix
     def build_subrow(self, config1: configuration, config2: configuration) -> np.array:
-        
+        return np.apply_along_axis(
+            lambda x: self.matrix_element(config1, x),
+            arr=config2.descriptors,
+            axis=1
+        )
