@@ -34,10 +34,20 @@ def main():
         .build_configurations(user_config['stepsize'])
     ]
 
+    Nconf = len(configurations)
+
     # calculate the nearest neighbors and the descriptors
     for config in configurations:
         config.init_nn(user_config['cutoff'])
         config.init_descriptor(qs)
+
+    # will be the super vectors
+    E = np.zeros(Nconf)
+    # this holds the matrix-elements in the shape [sum_j K(C^beta_j, C^alpha_i)]^beta_(alpha, i)
+    K = np.zeros((Nconf, Nconf * user_config['ion_nr']))
+
+    for 
+
 
 if __name__ == '__main__':
     main()

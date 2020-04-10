@@ -34,3 +34,6 @@ class Kernel:
         return sum(
             np.apply_along_axis(lambda x: self.kernel(config.descriptors, x), arr=descriptor, axis=1)
         )
+
+    def build_subrow(self, config1: configuration, config2: configuration) -> np.array:
+        

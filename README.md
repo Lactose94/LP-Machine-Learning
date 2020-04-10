@@ -104,7 +104,7 @@ Der Benutzer legt dabei die Parameter des Machine Learnings durch einträge in d
 ## Kernel
 Dieses Package versucht die wesentlichen Funktionalitäten des Kernels zu fokussieren.
 ### Funktionen:
-- ¸`linear_kernel(descriptor1: np.array, descriptor2: np.array) -> float`
+- `linear_kernel(descriptor1: np.array, descriptor2: np.array) -> float`
 - `gaussian_kernel(descriptor1: np.array, descriptor2: np.array, sigma: float) -> float`
 ### Die Kernel-Klasse
 Diese dient als wrapper um die übrigen Funktionalität dem User gebündelt zur Verfügung zu stellen
@@ -112,3 +112,4 @@ Diese dient als wrapper um die übrigen Funktionalität dem User gebündelt zur 
 - `kernel`: Enthält den gewünschten Kernel als Funktion.
 #### Methods
 - `matrix_element`: supply a set of descriptors for a configuration and **one element** of the set of **all** available configuration (vectors) and retrieve the corresponding matrix-element wrt the given kernel.
+- `build_subrow`: Takes as input two configurations and will return part of the row of the coefficient matrix. If we have the configurations alpha, beta, then we get the row `[K^alpha_(beta, 1), ..., K^alpha_(beta, Nions)]
