@@ -1,7 +1,7 @@
 import unittest
 from numpy import array, array_equal
 from outcar_parser import Parser
-
+import kernel
 
 class TestParser(unittest.TestCase):
 
