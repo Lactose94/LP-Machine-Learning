@@ -16,13 +16,13 @@ def gaussian_kernel(descriptor1: np.array, descriptor2: np.array, sigma: float) 
 
 
 class Kernel:
-    def __init__(self, mode, **kwargs):
+    def __init__(self, mode, *args):
         if mode == 'linear':
             self.kernel = linear_kernel
         elif mode == 'gaussian':
-            if 'sigma' not in kwargs:
+            if not args:
                 raise ValueError('For the Gaussian Kernel a sigma has to be supplied')
-            self.kernel = lambda x, y: gaussian_kernel(x, y, kwargs['sigma'])
+            self.kernel = lambda x, y: gaussian_kernel(x, y, args[0])
         else: 
             raise ValueError(f'kernel {mode} is not supported')
 

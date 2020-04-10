@@ -16,13 +16,8 @@ def main():
         range(1, user_config['nr_modi"']+1)
     )))
 
-
-    
-    # check if the kernel is implemented
-    mode = user_config['kernel']
-    if mode not in MODI:
-        raise ValueError('The choosen Kernel "{mode}" is not implemented')
-
+    # choose kernel
+    used_kernel = kernel.Kernel(user_config['kernel'])
 
     # load parser and save nr of ions and lattice vectors
     parser = Parser(user_config['file_in'])
