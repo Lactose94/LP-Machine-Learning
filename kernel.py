@@ -2,6 +2,7 @@ from math import exp
 import numpy as np
 import configuration
 
+
 def linear_kernel(descriptor1: np.array, descriptor2: np.array) -> float:
     if np.shape(descriptor1) != np.shape(descriptor2):
         raise ValueError('Shapes of input do not match')
@@ -11,8 +12,10 @@ def linear_kernel(descriptor1: np.array, descriptor2: np.array) -> float:
 def gaussian_kernel(descriptor1: np.array, descriptor2: np.array, sigma: float) -> float:
     if np.shape(descriptor1) != np.shape(descriptor2):
         raise ValueError('Shapes of input do not match')
-
-    return exp(np.linalg.norm(descriptor1 - descriptor2)**2 / (2 * sigma**2))
+    
+    # TODO: check if dot is useful
+    dr = descriptor1 - descriptor2
+    return exp(dr.dot(dr) / (2 * sigma**2))
 
 
 class Kernel:
@@ -28,4 +31,6 @@ class Kernel:
     
     # builds a matrix-element for a given configuration and !!one!! given descriptor vector (i.e. for !!one!! atom)
     def matrix_element(self, config: configuration, descriptor: np.array) -> float:
-        return np.sum(self.kernel(config.desciptors, descriptor))
+        return sum(
+            np.apply_along_axis(lambda x: self.kernel(config.descriptors, x), arr=descriptor, axis=1)
+        )

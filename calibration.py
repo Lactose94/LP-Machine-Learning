@@ -11,9 +11,8 @@ def main():
         user_config = json.load(u_conf)
 
     # make a lsit of the allowed qs
-    user_config['q'] = np.array(list(map(
-        lambda n: n * pi / user_config['cutoff'],
-        range(1, user_config['nr_modi"']+1)
+    qs = np.array(list(map(
+        lambda n: n * pi / user_config['cutoff'], range(1, user_config['nr_modi"']+1)
     )))
 
     # choose kernel
@@ -24,7 +23,7 @@ def main():
     user_config['ion_nr'] = parser.find_ion_nr()
     user_config['lattice_vectors'] = parser.find_lattice_vectors()
 
-    # TODO: check if lattice constant is bigger than 2 rcut
+    # check if lattice constant is bigger than 2 rcut
     lat_consts = np.array(np.linalg.norm(vec) for vec in user_config['lattice_vectors'])
     if any(2 * user_config['cutoff'] > lat_consts):
         raise ValueError('Cutoff cannot be bigger than half the lattice constants')
@@ -38,7 +37,7 @@ def main():
     # calculate the nearest neighbors and the descriptors
     for config in configurations:
         config.init_nn(user_config['cutoff'])
-        config.init_descriptor(user_config['q'])
+        config.init_descriptor(qs)
 
 if __name__ == '__main__':
     main()
