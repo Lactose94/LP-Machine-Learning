@@ -27,5 +27,5 @@ class Kernel:
             raise ValueError(f'kernel {mode} is not supported')
     
     # builds a matrix-element for a given configuration and !!one!! given descriptor vector (i.e. for !!one!! atom)
-    def matrix_element(self, config: configuration, descriptors: np.array) -> float:
-        return np.sum(self.kernel(config.desciptors, descriptors))
+    def matrix_element(self, config: configuration, descriptor: np.array) -> float:
+        return np.sum(self.kernel(config.desciptors, descriptor))

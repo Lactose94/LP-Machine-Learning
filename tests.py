@@ -82,12 +82,24 @@ class TestParser(unittest.TestCase):
 
 class TestCalibration(unittest.TestCase):
 
+    # Test if the q-vector is build correctly
     def test_build_q(self):
         pass
-
-    def test_kernel(self):
-        pass
-
+    
+    # Test if the program panics if the cutoff is bigger than a/2
     def test_cutoff_to_big(self):
         pass
 
+
+class TestKernel(unittest.TestCase):
+    
+    # Test if choosing the kernel works and panics of no sigma is given
+    def test_kernel_choice(self):
+        pass
+    
+    # Tests if the shape and value of the kernel-fcts is the expected
+    def test_kernel_value(self):
+        pass
+    
+    # tests if the shape and value of the matrix element is the expected
+    def test_matrix_element(self):
