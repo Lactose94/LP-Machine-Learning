@@ -9,10 +9,11 @@ def linear_kernel(descriptor1: np.array, descriptor2: np.array) -> float:
 
     return np.inner(descriptor1, descriptor2)
 
+
 def gaussian_kernel(descriptor1: np.array, descriptor2: np.array, sigma: float) -> float:
     if np.shape(descriptor1) != np.shape(descriptor2):
         raise ValueError('Shapes of input do not match')
-    
+
     dr = descriptor1 - descriptor2
     return exp(dr.dot(dr) / (2 * sigma**2))
 
@@ -25,10 +26,11 @@ class Kernel:
             if not args:
                 raise ValueError('For the Gaussian Kernel a sigma has to be supplied')
             self.kernel = lambda x, y: gaussian_kernel(x, y, args[0])
-        else: 
+        else:
             raise ValueError(f'kernel {mode} is not supported')
-    
-    # builds a matrix-element for a given configuration and !!one!! given descriptor vector (i.e. for !!one!! atom)
+
+    # builds a matrix-element for a given configuration
+    # and !!one!! given descriptor vector (i.e. for !!one!! atom)
     def matrix_element(self, config: configuration, descriptor: np.array) -> float:
         return sum(
             np.apply_along_axis(

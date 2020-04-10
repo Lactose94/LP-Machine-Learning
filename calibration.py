@@ -5,6 +5,7 @@ from outcar_parser import Parser
 from configuration import Configuration
 import kernel
 
+
 def main():
     # load the simulation parameters
     with open('user_config.json', 'r') as u_conf:
@@ -20,8 +21,8 @@ def main():
 
     # load parser and save nr of ions and lattice vectors
     parser = Parser(user_config['file_in'])
-    Nion = parser.find_ion_nr()
-    user_config['ion_nr'] = Nion
+    N_ion = parser.find_ion_nr()
+    user_config['ion_nr'] = N_ion
     lattice_vectors = parser.find_lattice_vectors()
     user_config['lattice_vectors'] = lattice_vectors
 
@@ -29,14 +30,14 @@ def main():
     lat_consts = np.array(np.linalg.norm(vec) for vec in lattice_vectors)
     if any(2 * user_config['cutoff'] > lat_consts):
         raise ValueError('Cutoff cannot be bigger than half the lattice constants')
-    
+
     # build the configurations from the parser
     configurations = [
         Configuration(position, energy, force) for (energy, position, force) in parser
         .build_configurations(user_config['stepsize'])
     ]
 
-    Nconf = len(configurations)
+    N_conf = len(configurations)
 
     # calculate the nearest neighbors and the descriptors
     for config in configurations:
@@ -44,16 +45,19 @@ def main():
         config.init_descriptor(qs)
 
     # will be the super vectors
-    E = np.zeros(Nconf)
+    E = np.zeros(N_conf)
     # this holds the matrix-elements in the shape [sum_j K(C^beta_j, C^alpha_i)]^beta_(alpha, i)
-    K = np.zeros((Nconf, Nconf * Nion))
+    K = np.zeros((N_conf, N_conf * N_ion))
 
     # build the linear system
     # TODO: Also calculate forces
-    for alpha in range(Nconf):
+    for alpha in range(N_conf):
         E[alpha] = configurations[alpha].energy
-        for beta in range(Nconf):
-            K[alpha, beta: beta + Nion] = used_kernel.build_subrow(configurations[alpha], configurations[beta])
+        for beta in range(N_conf):
+            K[alpha, beta: beta + N_ion] = used_kernel.build_subrow(
+                configurations[alpha],
+                configurations[beta]
+                )
 
 
 if __name__ == '__main__':
