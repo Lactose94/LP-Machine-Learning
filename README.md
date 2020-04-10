@@ -95,5 +95,15 @@ Der Benutzer legt dabei die Parameter des Machine Learnings durch einträge in d
 - `cutoff`: Hier gibt der Benutzer den Radius der Cutoff-Sphere an.
 - `nr_modi`: Gibt an, welche Länge die Descriptor-Vektoren haben sollen.
 - `lambda`: Parameter, welcher für die Ridge-Regression genutzt werden soll.
-- `Kernel`: Welcher Kernel für die Entwicklung der lokalen Energie genutzt werden sollen. Bisher werden nur `linear` und `gaussian` unterstützt. Falls letzters gewählt wird, muss auch der Parameter `sigma` für die Breite des Gaussian angegeben werden.
-jetzt sind wir nicht mehr in sync
+- `Kernel`: Welcher Kernel für die Entwicklung der lokalen Energie genutzt werden sollen und eventuell zusätzliche Parameter, z.B. das Sigma für den gaussian Kernel  . Bisher werden nur `linear` und `gaussian` unterstützt.
+
+---
+## Kernel
+Dieses Package versucht die wesentlichen Funktionalitäten des Kernels zu fokussieren.
+### Funktionen:
+- ¸`linear_kernel(descriptor1: np.array, descriptor2: np.array) -> float`
+- `gaussian_kernel(descriptor1: np.array, descriptor2: np.array, sigma: float) -> float`
+### Die Kernel-Klasse
+Diese dient als wrapper um die übrigen Funktionalität dem User gebündelt zur Verfügung zu stellen
+## Variablen:
+- `kernel`: Enthält den gewünschten Kernel als Funktion.

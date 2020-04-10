@@ -5,6 +5,5 @@
     "cutoff": 4e-10,
     "nr_modi": 8,
     "lambda": 1e-1,
-    "kernel": "linear",
-    "sigma": 1e-1
+    "kernel": ["linear", []]
 }

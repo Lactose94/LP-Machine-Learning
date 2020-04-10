@@ -1,30 +1,9 @@
 import json
-from math import pi, exp
+from math import pi
 import numpy as np
 from outcar_parser import Parser
 from configuration import Configuration
-
-
-# holds the supported kernels
-MODI = [
-    'linear',
-    'gaussian'
-]
-
-
-def linear_kernel(descriptor1: np.array, descriptor2: np.array) -> float:
-    if np.shape(descriptor1) != np.shape(descriptor2):
-        raise ValueError('Shapes of input do not match')
-
-    return np.inner(descriptor1, descriptor2)
-
-
-def gaussian_kernel(descriptor1: np.array, descriptor2: np.array, sigma: float) -> float:
-    if np.shape(descriptor1) != np.shape(descriptor2):
-        raise ValueError('Shapes of input do not match')
-
-    return exp(np.linalg.norm(descriptor1 - descriptor2)**2 / (2 * sigma**2))
-
+import kernel
 
 def main():
     # load the simulation parameters
@@ -37,16 +16,13 @@ def main():
         range(1, user_config['nr_modi"']+1)
     )))
 
+
+    
     # check if the kernel is implemented
     mode = user_config['kernel']
     if mode not in MODI:
         raise ValueError('The choosen Kernel "{mode}" is not implemented')
 
-    # return or compose the desired kernel
-    if mode == 'linear':
-        kernel = linear_kernel
-    elif mode == 'gaussian':
-        def kernel(x, y): return gaussian_kernel(x, y, user_config['sigma'])
 
     # load parser and save nr of ions and lattice vectors
     parser = Parser(user_config['file_in'])
