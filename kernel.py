@@ -13,7 +13,6 @@ def gaussian_kernel(descriptor1: np.array, descriptor2: np.array, sigma: float) 
     if np.shape(descriptor1) != np.shape(descriptor2):
         raise ValueError('Shapes of input do not match')
     
-    # TODO: check if dot is useful
     dr = descriptor1 - descriptor2
     return exp(dr.dot(dr) / (2 * sigma**2))
 

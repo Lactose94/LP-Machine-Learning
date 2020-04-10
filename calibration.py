@@ -20,11 +20,13 @@ def main():
 
     # load parser and save nr of ions and lattice vectors
     parser = Parser(user_config['file_in'])
-    user_config['ion_nr'] = parser.find_ion_nr()
-    user_config['lattice_vectors'] = parser.find_lattice_vectors()
+    Nion = parser.find_ion_nr()
+    user_config['ion_nr'] = Nion
+    lattice_vectors = parser.find_lattice_vectors()
+    user_config['lattice_vectors'] = lattice_vectors
 
     # check if lattice constant is bigger than 2 rcut
-    lat_consts = np.array(np.linalg.norm(vec) for vec in user_config['lattice_vectors'])
+    lat_consts = np.array(np.linalg.norm(vec) for vec in lattice_vectors)
     if any(2 * user_config['cutoff'] > lat_consts):
         raise ValueError('Cutoff cannot be bigger than half the lattice constants')
     
@@ -38,15 +40,20 @@ def main():
 
     # calculate the nearest neighbors and the descriptors
     for config in configurations:
-        config.init_nn(user_config['cutoff'])
+        config.init_nn(user_config['cutoff'], lattice_vectors)
         config.init_descriptor(qs)
 
     # will be the super vectors
     E = np.zeros(Nconf)
     # this holds the matrix-elements in the shape [sum_j K(C^beta_j, C^alpha_i)]^beta_(alpha, i)
-    K = np.zeros((Nconf, Nconf * user_config['ion_nr']))
+    K = np.zeros((Nconf, Nconf * Nion))
 
-    for 
+    # build the linear system
+    # TODO: Also calculate forces
+    for alpha in range(Nconf):
+        E[alpha] = configurations[alpha].energy
+        for beta in range(Nconf):
+            K[alpha, beta: beta + Nion] = used_kernel.build_subrow(configurations[alpha], configurations[beta])
 
 
 if __name__ == '__main__':
