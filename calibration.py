@@ -12,10 +12,8 @@ def main():
         user_config = json.load(u_conf)
 
     # make a lsit of the allowed qs
-    qs = np.array(list(map(
-        lambda n: n * pi / user_config['cutoff'], range(1, user_config['nr_modi']+1)
-    )))
-
+    qs = np.arange(1, user_config['nr_modi']+1) * pi / user_config['cutoff'] 
+    
     # choose kernel
     kern = kernel.Kernel(*user_config['kernel'])
 
