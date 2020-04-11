@@ -52,7 +52,8 @@ def main():
     E = np.zeros(N_conf)
     # this holds the matrix-elements in the shape [sum_j K(C^beta_j, C^alpha_i)]^beta_(alpha, i)
     K = np.zeros((N_conf, N_conf * N_ion))
-
+    # Holds forces flattened
+    F = np.zeros((N_conf * N_ion * 3, N_conf * N_ion))
     # build the linear system
     # TODO: Also calculate forces
     print('Building linear system')

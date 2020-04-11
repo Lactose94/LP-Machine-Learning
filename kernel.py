@@ -9,6 +9,12 @@ def linear_kernel(descriptor1: np.array, descriptor2: np.array) -> float:
 
     return np.inner(descriptor1, descriptor2)
 
+def linear_grad(q: float, R1: np.array, R2: np.array, dr: float) -> np.array:
+    dR = R1 - R2
+    if not dr:
+        dr = np.linalg.norm(dR) 
+
+    return np.cos(q * dr) * dR / dr
 
 def gaussian_kernel(descriptor1: np.array, descriptor2: np.array, sigma: float) -> float:
     if np.shape(descriptor1) != np.shape(descriptor2):
