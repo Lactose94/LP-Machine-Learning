@@ -95,7 +95,7 @@ Der Benutzer legt dabei die Parameter des Machine Learnings durch einträge in d
 - `file_in`: Hier wird der Pfad zum *outcar*-file, welches die Trainingsdaten enthält, eingetragen.
 - `file_out`: Hier kann der Benutzer angeben, in welcher Datei die Ergebnisse des Learnings eingetragen werden sollen. Wie genau diese aussehen, muss noch spezifiert werden.
 - `stepsize`: Hier gibt der Benutzer an, wie viele Konfigurationen beim Einlesen übersprungen werden sollen. Selbst wenn die Anzahl verfügbarer Konfigurationen überschritten wird, wird immer mindestens eine eingelesen.
-- `cutoff`: Hier gibt der Benutzer den Radius der Cutoff-Sphere an.
+- `cutoff`: Hier gibt der Benutzer den Radius der Cutoff-Sphere in Angstroem an.
 - `nr_modi`: Gibt an, welche Länge die Descriptor-Vektoren haben sollen.
 - `lambda`: Parameter, welcher für die Ridge-Regression genutzt werden soll.
 - `Kernel`: Welcher Kernel für die Entwicklung der lokalen Energie genutzt werden sollen und eventuell zusätzliche Parameter, z.B. das Sigma für den gaussian Kernel  . Bisher werden nur `linear` und `gaussian` unterstützt.
