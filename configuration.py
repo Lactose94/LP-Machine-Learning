@@ -67,9 +67,9 @@ if __name__ == '__main__':
     
     rcut = 4
     q = [np.pi/rcut,2*np.pi/rcut,3*np.pi/rcut]
-    lattice = np.array([[10.0 ,  0.0],
+    lattice = np.np.array([[10.0 ,  0.0],
                         [0.0 , 10.0]])
-    positions = np.array([[1.0 , 1.0], # hat 3 NN
+    positions = np.np.array([[1.0 , 1.0], # hat 3 NN
                           [1.0 , 9.0], # hat 2 NN
                           [3.0 , 3.0], # hat 1 NN
                           [9.0 , 9.0]]) # hat 2 NN

@@ -12,7 +12,7 @@ def main():
         user_config = json.load(u_conf)
 
     # make a lsit of the allowed qs
-    qs = np.array(list(map(
+    qs = np.np.array(list(map(
         lambda n: n * pi / user_config['cutoff'], range(1, user_config['nr_modi"']+1)
     )))
 
@@ -27,7 +27,7 @@ def main():
     user_config['lattice_vectors'] = lattice_vectors
 
     # check if lattice constant is bigger than 2 rcut
-    lat_consts = np.array(np.linalg.norm(vec) for vec in lattice_vectors)
+    lat_consts = np.np.array(np.linalg.norm(vec) for vec in lattice_vectors)
     if any(2 * user_config['cutoff'] > lat_consts):
         raise ValueError('Cutoff cannot be bigger than half the lattice constants')
 

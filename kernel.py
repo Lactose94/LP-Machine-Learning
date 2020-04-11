@@ -34,8 +34,8 @@ class Kernel:
     def matrix_element(self, config: configuration, descriptor: np.array) -> float:
         return sum(
             np.apply_along_axis(
-                lambda x: self.kernel(config.descriptors, x),
-                arr=descriptor,
+                lambda x: self.kernel(descriptor, x),
+                arr=config.descriptors,
                 axis=1)
         )
 
