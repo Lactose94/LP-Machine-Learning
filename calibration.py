@@ -40,9 +40,13 @@ def main():
     N_conf = len(configurations)
 
     # calculate the nearest neighbors and the descriptors
+    ctr = 1
+    print('calculating NN and descriptors')
     for config in configurations:
         config.init_nn(user_config['cutoff'], lattice_vectors)
         config.init_descriptor(qs)
+        print(f'{ctr}/{N_conf}', end='\r')
+        ctr += 1
 
     # will be the super vectors
     E = np.zeros(N_conf)
@@ -51,14 +55,15 @@ def main():
 
     # build the linear system
     # TODO: Also calculate forces
+    print('Building linear system')
     for alpha in range(N_conf):
         E[alpha] = configurations[alpha].energy
         for beta in range(N_conf):
+            print(f'{alpha}/{N_conf}; {beta}/{N_conf}', end='\r')
             K[alpha, beta: beta + N_ion] = kern.build_subrow(
                 configurations[alpha],
                 configurations[beta]
                 )
-
 
 if __name__ == '__main__':
     main()
