@@ -1,5 +1,5 @@
 {
-    "file_in": "outcar.21",
+    "file_in": "OUTCAR.21",
     "file_out": "out.txt",
     "stepsize": 10,
     "cutoff": 4,

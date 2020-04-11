@@ -82,6 +82,7 @@ class TestParser(unittest.TestCase):
             self.assertTrue(array_equal(force[0], g_force), 'returns wrong force')
             self.assertEqual(energy, g_energy, 'returns wrong energy')
 
+
 class TestCalibration(unittest.TestCase):
 
     # Test if the q-vector is build correctly
@@ -91,6 +92,7 @@ class TestCalibration(unittest.TestCase):
     # Test if the program panics if the cutoff is bigger than a/2
     def test_cutoff_too_big(self):
         pass
+
 
 class TestKernel(unittest.TestCase):
     # Tests if the shape and value of the kernel-fcts is the expected
@@ -116,14 +118,14 @@ class TestKernel(unittest.TestCase):
         self.assertEqual(type(zero_el), float64)
         self.assertEqual(zero_el, 0)
 
-        one = array([1] + [ 0 for _ in range(9)])
+        one = array([1] + [0 for _ in range(9)])
         one_el = kern.matrix_element(conf, one)
         self.assertEqual(one_el, 1)
 
         one = ones(10)
         ten_el = kern.matrix_element(conf, one)
         self.assertEqual(ten_el, 10)
-        
+ 
         five = 5 * one
         fifty_el = kern.matrix_element(conf, five)
         self.assertEqual(fifty_el, 50)
@@ -141,7 +143,7 @@ class TestKernel(unittest.TestCase):
         self.assertEqual(subrow[0], 1)
         self.assertTrue(array_equal(subrow[1:], zeros(19)))
 
-        conf2.descriptors=eye(20, 10)
+        conf2.descriptors = eye(20, 10)
 
         subrow = kern.build_subrow(conf1, conf2)
         self.assertTrue(array_equal(subrow[:10], ones(10)))
