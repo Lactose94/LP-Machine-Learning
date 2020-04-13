@@ -28,14 +28,14 @@ class Configuration(object):
     
     # returns the distances between the nearest neighbors
     def get_NNdistances(self, i=None):
-        if not i:
+        if i is None:
             return [self.distances[indices] for indices in self.NNlist]
         else:
             return self.distances[self.NNlist[i]]
 
     # returns the difference vector between the nearest neighbors
     def get_NNdifferences(self, i=None):
-        if not i:
+        if i is None:
             return [self.differences[indices] for indices in self.NNlist]
         else:
             return self.differences[self.NNlist]
@@ -43,8 +43,8 @@ class Configuration(object):
     # Diese Funktion erstellt die nearest-neighbour-tables für die Positionen und die Abstände.
     # Dafür muss die float-Variable rcut in Angström übergeben werden.
     def init_nn(self, rcut, lattice):
-        Nions, _ = np.shape(self.positions)
-        self.distances = np.zeros((Nions, Nions, 3)) 
+        Nions, dim = np.shape(self.positions)
+        self.differences = np.zeros((Nions, Nions, dim)) 
         self.distances = np.zeros((Nions, Nions)) 
         
         # get a vector of all lattice constants (primitive orthorhombic or cubic cell)
@@ -61,13 +61,14 @@ class Configuration(object):
                 self.distances[j, i] = dr
 
                 # stores the indices where the distance is smaller than the cutoff
-                indices = np.nonzero(self.distances < rcut) 
-                # set up the shape required for the numpy indexing
-                self.NNlist = [([], []) for _ in range(Nions)]
-                for (i, j) in zip(*indices):
-                    if self.distances[i, j] != 0:
-                        self.NNlist[i][0].append(i)
-                        self.NNlist[i][1].append(j)
+                
+        indices = np.nonzero(self.distances < rcut) 
+        # set up the shape required for the numpy indexing
+        self.NNlist = [([], []) for _ in range(Nions)]
+        for (i, j) in zip(*indices):
+            if self.distances[i, j] != 0:
+                self.NNlist[i][0].append(i)
+                self.NNlist[i][1].append(j)
                 
         
     # Diese Funktion erstellt die descriptor coefficients der configuration.
@@ -78,23 +79,24 @@ class Configuration(object):
             print("Execute Configuration.init_nn(rcut, lattice) before calculating descriptor coefficients!")
             return
         if self.descriptors is None:
-            Nions,  = np.shape(self.positions)
+            Nions, _ = np.shape(self.positions)
             nr_modi = np.size(q)
             self.descriptors = np.zeros((Nions, nr_modi))
             for i in range(Nions): # loop over central atoms
-                for j in nr_modi: # loop over modes
+                for j in range(nr_modi): # loop over modes
                     self.descriptors[i, j] = np.sum(
                         np.sin(q[j] * self.get_NNdistances(i))
                     )
+        else:
             print('descriptors were already set')
             
 if __name__ == '__main__':
     
     rcut = 4
     q = [np.pi/rcut,2*np.pi/rcut,3*np.pi/rcut]
-    lattice = np.np.array([[10.0 ,  0.0],
+    lattice = np.array([[10.0 ,  0.0],
                         [0.0 , 10.0]])
-    positions = np.np.array([[1.0 , 1.0], # hat 3 NN
+    positions = np.array([[1.0 , 1.0], # hat 3 NN
                           [1.0 , 9.0], # hat 2 NN
                           [3.0 , 3.0], # hat 1 NN
                           [9.0 , 9.0]]) # hat 2 NN
@@ -104,8 +106,8 @@ if __name__ == '__main__':
     
     # test init_nn
     config1.init_nn(rcut, lattice)
-    print(config1.get_NNdifferences)
-    print(config1.get_NNdistances)
+    print(config1.get_NNdifferences())
+    print(config1.get_NNdistances())
     
     # test init_descriptor
     config1.init_descriptor(q)
