@@ -59,7 +59,7 @@ class Kernel:
             raise ValueError('Dimension of supplied q and implied q by configuration1 do not match')
         
         
-        row = np.zeros((Nions * 3, Nions))
+        submat = np.zeros((Nions *3, Nions))
         # iterate over the i index. i.e. the atoms in config2
         for k in range(Nions):
             # iterate over different qs
@@ -75,13 +75,12 @@ class Kernel:
                         if i != j:
                             summands[i, j] = factors[i, j] * config1.differences[i, j]
 
-            matrix_elements = sum(summands, axis=1) 
+            matrix_elements = np.sum(summands, axis=1) 
             for i in range(Nions):
                 # TODO: check if this is the correct axis to sum over
-                matrix_elements[i] += sum(summands[config1.NNlist[i]], axis=0)
+                matrix_elements[i] += np.sum(summands[config1.NNlist[i]], axis=0)
             
             # TODO: check shape
-            print(np.shape(matrix_elements))
-            row += matrix_elements
+            submat[:, k] += matrix_elements.flatten()
 
-        return row.flatten()
+        return submat
