@@ -55,15 +55,20 @@ def main():
     K = np.zeros((N_conf, N_conf * N_ion))
     # Holds forces flattened
     F = np.zeros((N_conf * N_ion * 3, N_conf * N_ion))
-    # build the linear system
     t0 = time()
+    # build the linear system
     # TODO: Also calculate forces
     print('Building linear system')
     for alpha in range(N_conf):
         E[alpha] = configurations[alpha].energy
         for beta in range(N_conf):
             print(f'{alpha}/{N_conf}; {beta}/{N_conf}', end='\r')
-            K[alpha, beta: beta + N_ion] = kern.build_subrow(
+            K[alpha, beta: beta + N_ion] = kern.energy_subrow(
+                configurations[alpha],
+                configurations[beta]
+                )
+            F[alpha:alpha + N_ion + 3, beta: beta + N_ion] = kern.force_subrow(
+                qs,
                 configurations[alpha],
                 configurations[beta]
                 )

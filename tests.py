@@ -111,40 +111,40 @@ class TestKernel(unittest.TestCase):
             kernel.Kernel('gaussian')
 
     # tests if the shape and value of the matrix element is the expected
-    def test_matrix_element(self):
+    def test_energy_matrix_element(self):
         conf = Configuration(positions=zeros((10, 3)), descriptors=eye(10, 10))
         kern = kernel.Kernel('linear')
-        zero_el = kern.matrix_element(conf, zeros(10))
+        zero_el = kern.energy_matrix_element(conf, zeros(10))
         self.assertEqual(type(zero_el), float64)
         self.assertEqual(zero_el, 0)
 
         one = array([1] + [0 for _ in range(9)])
-        one_el = kern.matrix_element(conf, one)
+        one_el = kern.energy_matrix_element(conf, one)
         self.assertEqual(one_el, 1)
 
         one = ones(10)
-        ten_el = kern.matrix_element(conf, one)
+        ten_el = kern.energy_matrix_element(conf, one)
         self.assertEqual(ten_el, 10)
  
         five = 5 * one
-        fifty_el = kern.matrix_element(conf, five)
+        fifty_el = kern.energy_matrix_element(conf, five)
         self.assertEqual(fifty_el, 50)
 
     # tests if the shape and value of the subrow is correct
-    def test_subrow(self):
+    def test_energy_subrow(self):
         conf1 = Configuration(positions=zeros((10, 3)), descriptors=eye(20, 10))
         descr2 = zeros((20, 10))
         descr2[0, 0] = 1
         conf2 = Configuration(positions=zeros((10, 3)), descriptors=descr2)
 
         kern = kernel.Kernel('linear')
-        subrow = kern.build_subrow(conf1, conf2)
+        subrow = kern.energy_subrow(conf1, conf2)
         self.assertEqual(shape(subrow), (20, ))
         self.assertEqual(subrow[0], 1)
         self.assertTrue(array_equal(subrow[1:], zeros(19)))
 
         conf2.descriptors = eye(20, 10)
 
-        subrow = kern.build_subrow(conf1, conf2)
+        subrow = kern.energy_subrow(conf1, conf2)
         self.assertTrue(array_equal(subrow[:10], ones(10)))
         self.assertTrue(array_equal(subrow[10:], zeros(10)))

@@ -118,5 +118,6 @@ Diese dient als wrapper um die übrigen Funktionalität dem User gebündelt zur 
 #### Variablen:
 - `kernel`: Enthält den gewünschten Kernel als Funktion.
 #### Methods
-- `matrix_element`: supply a set of descriptors for a configuration and **one element** of the set of **all** available configuration (vectors) and retrieve the corresponding matrix-element wrt the given kernel.
-- `build_subrow`: Takes as input two configurations and will return part of the row of the coefficient matrix. If we have the configurations alpha, beta, then we get the row `[K^alpha_(beta, 1), ..., K^alpha_(beta, Nions)]`
+- `energy_matrix_element`: supply a set of descriptors for a configuration and **one element** of the set of **all** available configuration (vectors) and retrieve the corresponding energy matrix-element wrt the given kernel.
+- `energy_subrow`: Takes as input two configurations and will return part of the row of the energy coefficient matrix. If we have the configurations alpha, beta, then we get the row `[K^alpha_(beta, 1), ..., K^alpha_(beta, Nions)]`
+- `force_subrow(self, q: np.array, config1: configuration, config2: configuration) -> np.array:` Builds the force matrix elements T^(1, k=1,...., , m=1,...)_(2, i=1,...), for config1 and config2. **Attention**: this function is not symmetric in its arguments. The first configuration is the one corresponding to the force that is looked at.
