@@ -59,7 +59,7 @@ class Kernel:
             raise ValueError('Dimension of supplied q and implied q by configuration1 do not match')
         
         
-        submat = np.zeros((Nions *3, Nions))
+        submat = np.zeros((Nions * 3, Nions))
         # iterate over the i index. i.e. the atoms in config2
         for k in range(Nions):
             # iterate over different qs
@@ -70,11 +70,11 @@ class Kernel:
                 # this will hold the summands
                 # multiply the distance vectors by their corresponding prefactor
                 summands = config1.differences * factors[:, :, np.newaxis]
-
-            matrix_elements = np.sum(summands, axis=1) 
-            for i in range(Nions):
-                matrix_elements[i] += np.sum(summands[config1.NNlist[i]], axis=0)
+                # TODO: Check loops
+                matrix_elements = np.sum(summands, axis=1) 
+                for i in range(Nions):
+                    matrix_elements[i] += np.sum(summands[config1.NNlist[i]], axis=0)
             
-            submat[:, k] -= matrix_elements.flatten()
+                submat[:, k] += matrix_elements.flatten()
 
-        return submat
+        return -submat
