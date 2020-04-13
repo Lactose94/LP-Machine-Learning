@@ -107,6 +107,7 @@ if __name__ == '__main__':
     # test init_nn
     config1.init_nn(rcut, lattice)
     print(config1.get_NNdifferences())
+    print(list(map(lambda x: np.shape(x)[0], config1.get_NNdifferences())))
     print(config1.get_NNdistances())
     
     # test init_descriptor

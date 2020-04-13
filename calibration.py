@@ -1,4 +1,5 @@
 import json
+from time import time
 from math import pi
 import numpy as np
 from outcar_parser import Parser
@@ -40,12 +41,14 @@ def main():
     # calculate the nearest neighbors and the descriptors
     ctr = 1
     print('calculating NN and descriptors')
+    t0 = time()
     for config in configurations:
         config.init_nn(user_config['cutoff'], lattice_vectors)
         config.init_descriptor(qs)
         print(f'{ctr}/{N_conf}', end='\r')
         ctr += 1
-
+    t1 = time()
+    print(f'finished after {t1 - t0} s')
     # will be the super vectors
     E = np.zeros(N_conf)
     # this holds the matrix-elements in the shape [sum_j K(C^beta_j, C^alpha_i)]^beta_(alpha, i)
@@ -53,6 +56,7 @@ def main():
     # Holds forces flattened
     F = np.zeros((N_conf * N_ion * 3, N_conf * N_ion))
     # build the linear system
+    t0 = time()
     # TODO: Also calculate forces
     print('Building linear system')
     for alpha in range(N_conf):
@@ -63,6 +67,9 @@ def main():
                 configurations[alpha],
                 configurations[beta]
                 )
+    t1 = time()
+    print(f'finished after {t1 - t0} s')
 
+    
 if __name__ == '__main__':
     main()
