@@ -73,7 +73,7 @@ Diese muss zumindest mit einer Positions-Matrix der Ionen initialisiert werden. 
 - `forces` enthält die Kräftematrix der Ionen [Ionenindex, Raumkoordinatenindex] als 2d-numpy-array(float).
 - `differences`: Numpy array mit den Differenzvektoren zwischen alle Ionen, hat daher die shape (Nion, Nion, 3)
 - `distances`: Numpy array mit den Abständen zwischen allen Ionen, hat die shape (Nion, Nion)
-- `NNlist`: Hier werden die NN indices als 
+- `NNlist`: Hier werden die NN indices gespeichert, so dass NNlist[i] die NN-indices der nearest neighbors enthält. Ist in einer form  gespeichert, in der direkt die Werte aus dem array abgerufen werden.
 - `descriptors` enthält die descriptor-Koeffizientenmatrix der Ionen [Ionenindex, qindex] als 2d-numpy-array(float).
 
 #### Methoden:
