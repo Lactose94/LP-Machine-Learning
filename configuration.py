@@ -7,49 +7,48 @@
 
 import numpy as np
 
-def dist(r1, r2, a=1):
+def difference(r1, r2, a=1):
     dr = r2 - r1
     dr = dr - a * np.rint(dr/a) # rint = rounding to nearest integer (up or down)
-    magnitude = np.sqrt(dr.dot(dr))
-    return magnitude
+    return dr
 
 class Configuration(object):
     
     # Es wäre gut, wenn wir beim parser die Reihenfolge (positions, energy, forces) verwenden würden,
     # da wir nur bei der Kalibration alle 3 haben. Bei der Anwendung hätten wir nur mehr Positions
     # (daher energy und forces in der Klasse configurations mit None).
-    def __init__(self, positions, energy=None, forces=None, nnpositions=None, nndistances=None, descriptors=None):
+    def __init__(self, positions, energy=None, forces=None, differences=None, distances=None, NNlist=None, descriptors=None):
         self.positions = positions
         self.energy = energy
         self.forces = forces
-        self.nnpositions = nnpositions
-        self.nndistances = nndistances
+        self.differences = differences
+        self.distances = distances
+        self.NNlist = NNlist
         self.descriptors = descriptors
         
     # Diese Funktion erstellt die nearest-neighbour-tables für die Positionen und die Abstände.
     # Dafür muss die float-Variable rcut in Angström übergeben werden.
     def init_nn(self, rcut, lattice):
-        n = np.shape(self.positions)[0]
-        self.nnpositions = [[] for i in range(n)] # n lists of variable length inside a list
-        self.nndistances = [[] for i in range(n)] # n lists of variable length inside a list
+        Nions, _ = np.shape(self.positions)
+        self.distances = np.zeros((Nions, Nions, 3)) 
+        self.distances = np.zeros((Nions, Nions)) 
         
         # get a vector of all lattice constants (primitive orthorhombic or cubic cell)
         a = lattice.diagonal()
             
-        for i in range(n): # loop over central atoms
-            for j in range(i+1,n): # loop over possible nearest neighbours
-                dr = dist(self.positions[i,:], self.positions[j,:], a)
-                if dr < rcut:
-                    self.nnpositions[i].append(self.positions[j,:])
-                    self.nnpositions[j].append(self.positions[i,:])
-                    self.nndistances[i].append(dr)
-                    self.nndistances[j].append(dr)
+        for i in range(Nions): # loop over central atoms
+            for j in range(i+1,Nions): # loop over possible nearest neighbours
+                dR = difference(self.positions[i,:], self.positions[j,:], a)
+                self.differences[i, j] = dR
+                self.distances[i, j] = np.sqrt(dR.dot(dR))
+
+                self.NNlist = np.nonzero(self.distances < rcut )
         
     # Diese Funktion erstellt die descriptor coefficients der configuration.
     # Dafür muss ein float-Vektor q übergeben werden.
     # Dass dieser mit rcut zusammenpasst wird vorausgesetzt und nicht weiter überprüft.
     def init_descriptor(self, q):
-        if self.nndistances is None or self.nnpositions is None:
+        if self.distances is None or self.differences is None:
             print("Execute Configuration.init_nn(rcut) before calculating descriptor coefficients!")
             return
         if self.descriptors is None:

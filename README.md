@@ -62,7 +62,7 @@ Das Programm überprüft nicht die Plausibilität der Eingabedaten. Diese werden
 
 ---
 Das Package enthält im Wesentlichen eine Funktion und eine Klasse: 
-### dist(r1, r2, a=1):
+### difference(r1, r2, a=1):
 Diese Funktion berechnet den Distanzvektor der Positionen r1 und r2 nach der minimal image convention. Dabei ist a eine optionale Gitterkonstante, die mitgegeben werden muss wenn in kartesischen Koordinaten (im Gegensatz zu direkten Koordinaten) gerechnet wird.
 
 ### Die Configuration Klasse:
@@ -73,6 +73,7 @@ Diese muss zumindest mit einer Positions-Matrix der Ionen initialisiert werden. 
 - `forces` enthält die Kräftematrix der Ionen [Ionenindex, Raumkoordinatenindex] als 2d-numpy-array(float).
 - `differences`: Numpy array mit den Differenzvektoren zwischen alle Ionen, hat daher die shape (Nion, Nion, 3)
 - `distances`: Numpy array mit den Abständen zwischen allen Ionen, hat die shape (Nion, Nion)
+- `NNlist`: Hier werden die NN indices gespeichert um sie später abrufen zu können. Hat die Form eines tuples von index-arrays, damit die relevanten werte direkt via `array[NNlist]` abgerufen werden können.
 - `descriptors` enthält die descriptor-Koeffizientenmatrix der Ionen [Ionenindex, qindex] als 2d-numpy-array(float).
 
 #### Methoden:
