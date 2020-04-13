@@ -81,12 +81,11 @@ class Configuration(object):
             Nions,  = np.shape(self.positions)
             nr_modi = np.size(q)
             self.descriptors = np.zeros((Nions, nr_modi))
-            for i in range(0, nr_modi): # loop over central atoms
-                nrnn = np.size(self.nndistances[i]) # number of nearest neighbours for atom i
-                for j in range(0,n): # loop over q
-                    for k in range(0,nrnn): # loop over nearest neighbours of atom i
-                        self.descriptors[i,j] += np.sin(q[j] * self.nndistances[i][k])
-        else:
+            for i in range(Nions): # loop over central atoms
+                for j in nr_modi: # loop over modes
+                    self.descriptors[i, j] = np.sum(
+                        np.sin(q[j] * self.get_NNdistances(i))
+                    )
             print('descriptors were already set')
             
 if __name__ == '__main__':
@@ -105,8 +104,8 @@ if __name__ == '__main__':
     
     # test init_nn
     config1.init_nn(rcut, lattice)
-    print(config1.nnpositions)
-    print(config1.nndistances)
+    print(config1.get_NNdifferences)
+    print(config1.get_NNdistances)
     
     # test init_descriptor
     config1.init_descriptor(q)
