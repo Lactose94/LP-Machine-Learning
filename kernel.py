@@ -66,21 +66,15 @@ class Kernel:
             for l in range(nr_modi):
                 # build the scalar prefactor for each distance vector
                 factors = config2.descriptors[k, l] * grad_scalar(q[l], config1.distances)
-
+                np.fill_diagonal(factors, 0)
                 # this will hold the summands
-                summands = np.zeros((Nions, Nions, 3))
                 # multiply the distance vectors by their corresponding prefactor
-                for i in range(Nions):
-                    for j in range(Nions):
-                        if i != j:
-                            summands[i, j] = factors[i, j] * config1.differences[i, j]
+                summands = config1.differences * factors[:, :, np.newaxis]
 
             matrix_elements = np.sum(summands, axis=1) 
             for i in range(Nions):
-                # TODO: check if this is the correct axis to sum over
                 matrix_elements[i] += np.sum(summands[config1.NNlist[i]], axis=0)
             
-            # TODO: check shape
-            submat[:, k] += matrix_elements.flatten()
+            submat[:, k] -= matrix_elements.flatten()
 
         return submat
