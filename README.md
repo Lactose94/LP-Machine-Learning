@@ -73,12 +73,17 @@ Diese muss zumindest mit einer Positions-Matrix der Ionen initialisiert werden. 
 - `forces` enthält die Kräftematrix der Ionen [Ionenindex, Raumkoordinatenindex] als 2d-numpy-array(float).
 - `differences`: Numpy array mit den Differenzvektoren zwischen alle Ionen, hat daher die shape (Nion, Nion, 3)
 - `distances`: Numpy array mit den Abständen zwischen allen Ionen, hat die shape (Nion, Nion)
-- `NNlist`: Hier werden die NN indices gespeichert um sie später abrufen zu können. Hat die Form eines tuples von index-arrays, damit die relevanten werte direkt via `array[NNlist]` abgerufen werden können.
+- `NNlist`: Hier werden die NN indices als 
 - `descriptors` enthält die descriptor-Koeffizientenmatrix der Ionen [Ionenindex, qindex] als 2d-numpy-array(float).
 
 #### Methoden:
 - **init_NN(rcut, lattice)**:  
   Erstellt unter Übergabe eines cutoff-Radius rcut (float in Angstrom) und des Gitters lattice (float numpy array in Angstrom) die beiden konfigurationseigenen nearest-neighbour-tables nnpositions und nndistances. Dass der cutoff-Radius sinnvoll mit der Positionsmatrix zusammenpasst, also kleiner als die halbe Gitterkonstante ist, wird dabei vorausgesetzt aber nicht überprüft!
+
+- **get_NNdistances(i=None)**:
+  Gibt die NN-Abstände des Atoms i als array aus. Wenn kein index spezifiert wird, wird eine Liste für alle Atome erstellt.
+- **get_NNdifferences(i=None)**:
+  Gibt die NN-Differenzvektoren des Atoms i als array aus. Wenn kein index spezifiert wird, wird eine Liste für alle Atome erstellt
 - **init_descriptor(q)**:  
   Erstellt unter Übergabe eines q-Vektors (float) die descriptor-Koeffizientenmatrix. Dass der cutoff-Radius sinnvoll mit dem q-Vektor zusammenpasst wird dabei vorausgesetzt und nicht überprüft. Der descriptor-Koeffizient C_i für ein Ion i berechnet sich dabei wie folgt:
   

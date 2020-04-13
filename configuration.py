@@ -25,7 +25,21 @@ class Configuration(object):
         self.distances = distances
         self.NNlist = NNlist
         self.descriptors = descriptors
-        
+    
+    # returns the distances between the nearest neighbors
+    def get_NNdistances(self, i=None):
+        if not i:
+            return [self.distances[indices] for indices in self.NNlist]
+        else:
+            return self.distances[self.NNlist[i]]
+
+    # returns the difference vector between the nearest neighbors
+    def get_NNdifferences(self, i=None):
+        if not i:
+            return [self.differences[indices] for indices in self.NNlist]
+        else:
+            return self.differences[self.NNlist]
+
     # Diese Funktion erstellt die nearest-neighbour-tables für die Positionen und die Abstände.
     # Dafür muss die float-Variable rcut in Angström übergeben werden.
     def init_nn(self, rcut, lattice):
@@ -40,27 +54,40 @@ class Configuration(object):
             for j in range(i+1,Nions): # loop over possible nearest neighbours
                 dR = difference(self.positions[i,:], self.positions[j,:], a)
                 self.differences[i, j] = dR
-                self.distances[i, j] = np.sqrt(dR.dot(dR))
+                self.differences[j, i] = dR
+                
+                dr = np.sqrt(dR.dot(dR))
+                self.distances[i, j] = dr
+                self.distances[j, i] = dr
 
-                self.NNlist = np.nonzero(self.distances < rcut )
+                # stores the indices where the distance is smaller than the cutoff
+                indices = np.nonzero(self.distances < rcut) 
+                # set up the shape required for the numpy indexing
+                self.NNlist = [([], []) for _ in range(Nions)]
+                for (i, j) in zip(*indices):
+                    if self.distances[i, j] != 0:
+                        self.NNlist[i][0].append(i)
+                        self.NNlist[i][1].append(j)
+                
         
     # Diese Funktion erstellt die descriptor coefficients der configuration.
     # Dafür muss ein float-Vektor q übergeben werden.
     # Dass dieser mit rcut zusammenpasst wird vorausgesetzt und nicht weiter überprüft.
     def init_descriptor(self, q):
         if self.distances is None or self.differences is None:
-            print("Execute Configuration.init_nn(rcut) before calculating descriptor coefficients!")
+            print("Execute Configuration.init_nn(rcut, lattice) before calculating descriptor coefficients!")
             return
         if self.descriptors is None:
-            m = np.shape(self.positions)[0]
-            n = np.size(q)
-            self.descriptors = np.zeros((m, n))
-            for i in range(0,m): # loop over central atoms
+            Nions,  = np.shape(self.positions)
+            nr_modi = np.size(q)
+            self.descriptors = np.zeros((Nions, nr_modi))
+            for i in range(0, nr_modi): # loop over central atoms
                 nrnn = np.size(self.nndistances[i]) # number of nearest neighbours for atom i
                 for j in range(0,n): # loop over q
                     for k in range(0,nrnn): # loop over nearest neighbours of atom i
                         self.descriptors[i,j] += np.sin(q[j] * self.nndistances[i][k])
-        return
+        else:
+            print('descriptors were already set')
             
 if __name__ == '__main__':
     
