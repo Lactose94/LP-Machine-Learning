@@ -54,20 +54,22 @@ def main():
     # this holds the matrix-elements in the shape [sum_j K(C^beta_j, C^alpha_i)]^beta_(alpha, i)
     K = np.zeros((N_conf, N_conf * N_ion))
     # Holds forces flattened
-    F = np.zeros((N_conf * N_ion * 3, N_conf * N_ion))
+    F = np.zeros(N_conf * N_ion * 3)
+    T = np.zeros((N_conf * N_ion * 3, N_conf * N_ion))
     t0 = time()
     # build the linear system
-    # TODO: Also calculate forces
     print('Building linear system')
     for alpha in range(N_conf):
         E[alpha] = configurations[alpha].energy
+        F[alpha*N_ion*3: (alpha+1)*N_ion*3] = configurations[alpha].forces.flatten()
         for beta in range(N_conf):
             print(f'{alpha}/{N_conf}; {beta}/{N_conf}', end='\r')
-            K[alpha, beta: beta + N_ion] = kern.energy_subrow(
+            # FIXME: Indexing here is definitely wrong - maybe fixed
+            K[alpha, beta*N_ion: (beta+1)*N_ion] = kern.energy_subrow(
                 configurations[alpha],
                 configurations[beta]
                 )
-            F[alpha:alpha + N_ion + 3, beta: beta + N_ion] = kern.force_subrow(
+            T[alpha*N_ion*3:(alpha+1)*N_ion*3, beta*N_ion: (beta+1)*N_ion] = kern.force_subrow(
                 qs,
                 configurations[alpha],
                 configurations[beta]
