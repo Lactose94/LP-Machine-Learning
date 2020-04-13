@@ -8,7 +8,8 @@ def linear_kernel(descriptor1: np.array, descriptor2: np.array) -> float:
         raise ValueError('Shapes of input do not match')
 
     return np.inner(descriptor1, descriptor2)
-
+# TODO: rework this, this does not play well with the precalculated distances
+# REMINDER: You have to use the correct distance function!!
 def linear_grad(q: float, R1: np.array, R2: np.array, dr: float) -> np.array:
     dR = R1 - R2
     if not dr:

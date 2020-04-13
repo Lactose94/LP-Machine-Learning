@@ -63,7 +63,7 @@ Das Programm überprüft nicht die Plausibilität der Eingabedaten. Diese werden
 ---
 Das Package enthält im Wesentlichen eine Funktion und eine Klasse: 
 ### dist(r1, r2, a=1):
-Diese Funktion berechnet die Distanz der Positionen r1 und r2 nach der minimal image convention. Dabei ist a eine optionale Gitterkonstante, die mitgegeben werden muss wenn in kartesischen Koordinaten (im Gegensatz zu direkten Koordinaten) gerechnet wird.
+Diese Funktion berechnet den Distanzvektor der Positionen r1 und r2 nach der minimal image convention. Dabei ist a eine optionale Gitterkonstante, die mitgegeben werden muss wenn in kartesischen Koordinaten (im Gegensatz zu direkten Koordinaten) gerechnet wird.
 
 ### Die Configuration Klasse:
 Diese muss zumindest mit einer Positions-Matrix der Ionen initialisiert werden. Energie und Kräfte-Matrix sind optional, da diese nicht zwingend bekannt sind. Es ist auch möglich die nearesr-neigbour-tables ihrer Positionen und der Abstände gleich zu initialisieren, falls dies erwünscht ist. Die Klasse besitzt jedoch Methoden diese selbst zu berechnen. Dies gilt ebenso für die Descriptor-Koeffizienten.
@@ -71,8 +71,8 @@ Diese muss zumindest mit einer Positions-Matrix der Ionen initialisiert werden. 
 - `positions` enthält die Positionsmatrix der Ionen [Ionenindex, Raumkoordinatenindex] als 2d-numpy-array(float).
 - `energy` enthält die Energie der Konfiguration als float.
 - `forces` enthält die Kräftematrix der Ionen [Ionenindex, Raumkoordinatenindex] als 2d-numpy-array(float).
-- `nnpositions` enthält die nearest-neighbour-Positionsmatrix der Ionen als list(list(list(float))).
-- `nndistances` enthält die nearest-neighbour-Abständematrix der Ionen als list(list(float)).
+- `differences`: Numpy array mit den Differenzvektoren zwischen alle Ionen, hat daher die shape (Nion, Nion, 3)
+- `distances`: Numpy array mit den Abständen zwischen allen Ionen, hat die shape (Nion, Nion)
 - `descriptors` enthält die descriptor-Koeffizientenmatrix der Ionen [Ionenindex, qindex] als 2d-numpy-array(float).
 
 #### Methoden:
