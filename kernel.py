@@ -59,14 +59,12 @@ class Kernel:
         if nr_modi != len_desc:
             raise ValueError('Dimension of supplied q and implied q by configuration1 do not match')
         
-        
         submat = np.zeros((Nions * dim, Nions))
         # iterate over the i index. i.e. the atoms in config2
         for l in range(nr_modi):
             # build the scalar prefactor for each distance vector
             factors = grad_scalar(q[l], config1.distances)
             np.fill_diagonal(factors, 0)
-
 
             # multiply the distance vectors by their corresponding prefactor
             summands = factors[:, :, np.newaxis] * config1.differences
@@ -80,7 +78,7 @@ class Kernel:
 
             vec_and_mat = config2.descriptors[:, l, np.newaxis, np.newaxis] * matrix_elements
 
-        # TODO: be careful here
             submat -= vec_and_mat.reshape(Nions, Nions * dim).T
+
 
         return submat
