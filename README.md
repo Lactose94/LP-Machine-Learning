@@ -111,8 +111,8 @@ Der Benutzer legt dabei die Parameter des Machine Learnings durch einträge in d
 Dieses Package versucht die wesentlichen Funktionalitäten des Kernels zu fokussieren.
 ### Funktionen:
 - `linear_kernel(descriptor1: np.array, descriptor2: np.array) -> float`
-- `linear_grad(q: float, R1: np.array, R2: np.array, dr=None) -> np.array`. This returns the building block for the tensor, from which we will fit the forces. Can give the distance between the two input vectors, if it is already calculated. **Insert reference to mathematical documentation**
 - `gaussian_kernel(descriptor1: np.array, descriptor2: np.array, sigma: float) -> float`
+- `grad_scalar(q: float, dr: np.array) -> np.array:` Erstell aus einem Array aus Abständen die Vorfaktoren für die jeweiligen Differenzvektoren, die zu diesem abstand korrespondieren. 
 ### Die Kernel-Klasse
 Diese dient als wrapper um die übrigen Funktionalität dem User gebündelt zur Verfügung zu stellen
 #### Variablen:
