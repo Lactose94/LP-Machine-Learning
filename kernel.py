@@ -55,26 +55,32 @@ class Kernel:
     def force_subrow(self, q: np.array, config1: configuration, config2: configuration) -> np.array:
         nr_modi = len(q)
         Nions, len_desc = np.shape(config1.descriptors)
+        _, dim = np.shape(config1.positions)
         if nr_modi != len_desc:
             raise ValueError('Dimension of supplied q and implied q by configuration1 do not match')
         
         
-        submat = np.zeros((Nions *3, Nions))
+        submat = np.zeros((Nions * dim, Nions))
         # iterate over the i index. i.e. the atoms in config2
         for l in range(nr_modi):
             # build the scalar prefactor for each distance vector
             factors = grad_scalar(q[l], config1.distances)
             np.fill_diagonal(factors, 0)
-            factors = config2.descriptors[:, l, np.newaxis, np.newaxis] * factors
-            # this will hold the summands
-            # multiply the distance vectors by their corresponding prefactor
-            summands = config1.differences * factors[:, :, :,np.newaxis]
 
+
+            # multiply the distance vectors by their corresponding prefactor
+            summands = factors[:, :, np.newaxis] * config1.differences
+
+            # summ over all ions
             matrix_elements = np.sum(summands, axis=1)  
             # TODO: make sense of this
+            #sum over nearest neighbors
             for i in range(Nions):
                 matrix_elements[i] += np.sum(summands[config1.NNlist[i]], axis=0)
+
+            vec_and_mat = config2.descriptors[:, l, np.newaxis, np.newaxis] * matrix_elements
+
         # TODO: be careful here
-            submat -= matrix_elements.reshape(64, 192).T
+            submat -= vec_and_mat.reshape(Nions, Nions * dim).T
 
         return submat
