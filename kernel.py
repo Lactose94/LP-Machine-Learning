@@ -61,20 +61,20 @@ class Kernel:
         
         submat = np.zeros((Nions *3, Nions))
         # iterate over the i index. i.e. the atoms in config2
-        for k in range(Nions):
-            # iterate over different qs
-            for l in range(nr_modi):
-                # build the scalar prefactor for each distance vector
-                factors = config2.descriptors[k, l] * grad_scalar(q[l], config1.distances)
-                np.fill_diagonal(factors, 0)
-                # this will hold the summands
-                # multiply the distance vectors by their corresponding prefactor
-                summands = config1.differences * factors[:, :, np.newaxis]
+        for l in range(nr_modi):
+            # build the scalar prefactor for each distance vector
+            factors = grad_scalar(q[l], config1.distances)
+            np.fill_diagonal(factors, 0)
+            factors = config2.descriptors[:, l, np.newaxis, np.newaxis] * factors
+            # this will hold the summands
+            # multiply the distance vectors by their corresponding prefactor
+            summands = config1.differences * factors[:, :, :,np.newaxis]
 
-            matrix_elements = np.sum(summands, axis=1) 
+            matrix_elements = np.sum(summands, axis=1)  
+            # TODO: make sense of this
             for i in range(Nions):
                 matrix_elements[i] += np.sum(summands[config1.NNlist[i]], axis=0)
-            
-            submat[:, k] -= matrix_elements.flatten()
+        # TODO: be careful here
+            submat -= matrix_elements.reshape(64, 192).T
 
         return submat
