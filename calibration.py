@@ -1,6 +1,6 @@
 import json
-from math import pi
 from time import time
+from math import pi
 import numpy as np
 from outcar_parser import Parser
 from configuration import Configuration
@@ -54,22 +54,28 @@ def main():
     # this holds the matrix-elements in the shape [sum_j K(C^beta_j, C^alpha_i)]^beta_(alpha, i)
     K = np.zeros((N_conf, N_conf * N_ion))
     # Holds forces flattened
-    F = np.zeros((N_conf * N_ion * 3, N_conf * N_ion))
-    # build the linear system
+    F = np.zeros(N_conf * N_ion * 3)
+    T = np.zeros((N_conf * N_ion * 3, N_conf * N_ion))
     t0 = time()
-    # TODO: Also calculate forces
+    # build the linear system
     print('Building linear system')
     for alpha in range(N_conf):
         E[alpha] = configurations[alpha].energy
+        F[alpha*N_ion*3: (alpha+1)*N_ion*3] = configurations[alpha].forces.flatten()
         for beta in range(N_conf):
-            print(f'{alpha}/{N_conf}; {beta}/{N_conf}', end='\r')
-            K[alpha, beta: beta + N_ion] = kern.build_subrow(
+            print(f'{alpha}/{N_conf}; {beta}/{N_conf}           ', end='\r')
+            K[alpha, beta*N_ion: (beta+1)*N_ion] = kern.energy_subrow(
+                configurations[alpha],
+                configurations[beta]
+                )
+            T[alpha*N_ion*3:(alpha+1)*N_ion*3, beta*N_ion: (beta+1)*N_ion] = kern.force_subrow(
+                qs,
                 configurations[alpha],
                 configurations[beta]
                 )
     t1 = time()
     print(f'finished after {t1 - t0} s')
 
-
+    
 if __name__ == '__main__':
     main()
