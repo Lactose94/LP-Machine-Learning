@@ -10,19 +10,19 @@ import numpy as np
 def dist(r1, r2, a=1):
     dr = r2 - r1
     dr = dr - a * np.rint(dr/a) # rint = rounding to nearest integer (up or down)
-    magnitude = np.sqrt(dr.dot(dr))
-    return magnitude
+    #magnitude = np.sqrt(dr.dot(dr))
+    return dr
 
 class Configuration(object):
     
     # Es wäre gut, wenn wir beim parser die Reihenfolge (positions, energy, forces) verwenden würden,
     # da wir nur bei der Kalibration alle 3 haben. Bei der Anwendung hätten wir nur mehr Positions
     # (daher energy und forces in der Klasse configurations mit None).
-    def __init__(self, positions, energy=None, forces=None, nnpositions=None, nndistances=None, descriptors=None):
+    def __init__(self, positions, energy=None, forces=None, nndisplacements=None, nndistances=None, descriptors=None):
         self.positions = positions
         self.energy = energy
         self.forces = forces
-        self.nnpositions = nnpositions
+        self.nndisplacements = nndisplacements
         self.nndistances = nndistances
         self.descriptors = descriptors
         
@@ -30,7 +30,7 @@ class Configuration(object):
     # Dafür muss die float-Variable rcut in Angström übergeben werden.
     def init_nn(self, rcut, lattice):
         n = np.shape(self.positions)[0]
-        self.nnpositions = [[] for i in range(n)] # n lists of variable length inside a list
+        self.nndisplacements = [[] for i in range(n)] # n lists of variable length inside a list
         self.nndistances = [[] for i in range(n)] # n lists of variable length inside a list
         
         # get a vector of all lattice constants (primitive orthorhombic or cubic cell)
@@ -38,10 +38,11 @@ class Configuration(object):
             
         for i in range(n): # loop over central atoms
             for j in range(i+1,n): # loop over possible nearest neighbours
-                dr = dist(self.positions[i,:], self.positions[j,:], a)
+                rj_ri = dist(self.positions[i,:], self.positions[j,:], a)
+                dr = np.sqrt(rj_ri.dot(rj_ri))
                 if dr < rcut:
-                    self.nnpositions[i].append(self.positions[j,:])
-                    self.nnpositions[j].append(self.positions[i,:])
+                    self.nndisplacements[i].append(rj_ri) # NN atom - central atom
+                    self.nndisplacements[j].append(-rj_ri) # NN atom - central atom
                     self.nndistances[i].append(dr)
                     self.nndistances[j].append(dr)
         
@@ -49,10 +50,10 @@ class Configuration(object):
     # Dafür muss ein float-Vektor q übergeben werden.
     # Dass dieser mit rcut zusammenpasst wird vorausgesetzt und nicht weiter überprüft.
     def init_descriptor(self, q):
-        if self.nndistances is None or self.nnpositions is None:
-            print("Execute Configuration.init_nn(rcut) before calculating descriptor coefficients!")
+        if self.nndistances is None or self.nndisplacements is None:
+            print("Execute Configuration.init_nn(rcut,lattice) before calculating descriptor coefficients!")
             return
-        if self.descriptors is None:
+        else:
             m = np.shape(self.positions)[0]
             n = np.size(q)
             self.descriptors = np.zeros((m, n))
@@ -79,7 +80,7 @@ if __name__ == '__main__':
     
     # test init_nn
     config1.init_nn(rcut, lattice)
-    print(config1.nnpositions)
+    print(config1.nndisplacements)
     print(config1.nndistances)
     
     # test init_descriptor
