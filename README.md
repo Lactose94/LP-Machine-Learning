@@ -110,9 +110,9 @@ Der Benutzer legt dabei die Parameter des Machine Learnings durch einträge in d
 ## Kernel
 Dieses Package versucht die wesentlichen Funktionalitäten des Kernels zu fokussieren.
 ### Funktionen:
-- `linear_kernel(descriptor1: np.array, descriptor2: np.array) -> float`
-- `gaussian_kernel(descriptor1: np.array, descriptor2: np.array, sigma: float) -> float`
-- `grad_scalar(q: float, dr: np.array) -> np.array:` Erstell aus einem Array aus Abständen die Vorfaktoren für die jeweiligen Differenzvektoren, die zu diesem abstand korrespondieren. 
+- `linear_kernel(descr_list1: np.array, descr_list2: np.array) -> np.array:` Given two arrays of descriptors, this function calculates the Kernel matrix wrt the linear kernel.
+- `gaussian_kernel(descr_list1: np.array, descr_list2: np.array, sigma: float) -> np.float:` Given two arrays of descriptors, this function calculates the Kernel matrix wrt the linear gaussian kernel.
+- `grad_scalar(q: float, dr: np.array) -> np.array:` The gradient of a descriptor is the sum over a scalar prefactor times a difference-vector. This function builds the scalar prefactors from an array of distances.
 - `def linear_force_subrow(q: np.array, config1: configuration, descriptors_array: np.array) -> np.array:` Builds the force matrix elements for config1 given a set of descriptors, in the *linear* case. For example, if we have two configurations, then the function will build the matrix element T^(1,k=1,...,Nions, l=1...,3)_(2,i=1,...,Nions).
 If given a complete set of descriptors i.e (Nconf * Nions, n_q) it builds the rows of the coefficient matrix for the given configuration.
 
