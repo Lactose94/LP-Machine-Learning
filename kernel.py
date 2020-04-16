@@ -1,4 +1,3 @@
-from math import exp
 import numpy as np
 import configuration
 
@@ -15,6 +14,7 @@ def linear_kernel(descr_list1: np.array, descr_list2: np.array) -> np.array:
     return np.dot(descr_list1, descr_list2.T)   
 
 # TODO: write decomposition into the mathematical documentation
+# TODO: check if something's up with the diagonal elements
 def gaussian_kernel(descr_list1: np.array, descr_list2: np.array, sigma: float) -> np.float:
 
     abs1 = linear_kernel(descr_list1, descr_list1)
@@ -27,7 +27,7 @@ def gaussian_kernel(descr_list1: np.array, descr_list2: np.array, sigma: float) 
     coeffs = linear_kernel(descr_list1, descr_list2)
 
     dr = abs1 - 2 * coeffs + abs2
-    return exp(dr/ (2 * sigma**2))
+    return np.exp(dr/ (2 * sigma**2))
 
 
 # returns the scalar prefactor for the matrix element of the forces
