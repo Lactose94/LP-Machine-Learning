@@ -45,6 +45,7 @@ class Kernel:
         )
 
     # builds part of the row of the energy kernel matrix
+    # NOTE: This will be easy to refactor. Just replace config2 by set of descriptors
     def energy_subrow(self, config1: configuration, config2: configuration) -> np.array:
         return np.apply_along_axis(
             lambda x: self.energy_matrix_element(config1, x),
@@ -54,6 +55,8 @@ class Kernel:
 
     # TODO: implement different kernels
     # builds part of the row for the force kernel matrix
+    # NOTE: this is also not to hard to rework. Again, replace config2 by the set of descriptors
+    # TODO: In that case check the dimension for submat, as it surely has to change
     def force_subrow(self, q: np.array, config1: configuration, config2: configuration) -> np.array:
         nr_modi = len(q)
         n_ions, len_desc = np.shape(config1.descriptors)
@@ -62,7 +65,6 @@ class Kernel:
             raise ValueError('Dimension of supplied q and implied q by configuration1 do not match')
 
         submat = np.zeros((n_ions * dim, n_ions))
-        # iterate over the i index. i.e. the atoms in config2
 
         for l in range(nr_modi):
             # build the scalar prefactor for each distance vector
