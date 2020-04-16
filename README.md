@@ -121,5 +121,5 @@ Diese dient als wrapper um die übrigen Funktionalität dem User gebündelt zur 
 #### Variablen:
 - `kernel`: Enthält den gewünschten Kernel als Funktion.
 #### Methods
-- `energy_matrix_element`: supply two sets of descriptors, from which then the corresponding matrixelements are build. For example, if descriptors of config1 and config2 are given, the output will be sum_i K^(1,i=1,..,Nions)_(2,j=1,...,Nions). If we supply one configuration and a full set of descriptors, then we get the corresponding row, which multiplied by the weights should give the energy.
+- `energy_matrix_element`: supply two sets of descriptors, from which the corresponding matrixelements are built. For example, if descriptors of config1 and config2 are given, the output will be sum_i K^(1,i=1,..,Nions)_(2,j=1,...,Nions). If we supply one configuration and a full set of descriptors, then we get the corresponding row, which multiplied by the weights should give the energy.
 - `force_submat`: takes as input two configurations and just applies the correct submatrix (linear or gaussian) to them.

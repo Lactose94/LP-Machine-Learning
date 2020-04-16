@@ -19,11 +19,11 @@ def gaussian_kernel(descr_list1: np.array, descr_list2: np.array, sigma: float) 
 
     abs1 = linear_kernel(descr_list1, descr_list1)
     if not np.size(abs1) == 1:
-        abs1 = np.diag(abs1)
+        abs1 = np.diag(abs1)[:, np.newaxis]
 
     abs2 = linear_kernel(descr_list2, descr_list2)
     if not np.size(abs2) == 1:
-        abs2 = np.diag(abs2)[:, np.newaxis]
+        abs2 = np.diag(abs2)[np.newaxis, :]
     coeffs = linear_kernel(descr_list1, descr_list2)
 
     dr = abs1 - 2 * coeffs + abs2
