@@ -121,6 +121,5 @@ Diese dient als wrapper um die übrigen Funktionalität dem User gebündelt zur 
 #### Variablen:
 - `kernel`: Enthält den gewünschten Kernel als Funktion.
 #### Methods
-- `energy_matrix_element`: supply a set of descriptors for a configuration and **one element** of the set of **all** available configuration (vectors) and retrieve the corresponding energy matrix-element wrt the given kernel.
-- `energy_subrow`: Takes as input two configurations and will return part of the row of the energy coefficient matrix. If we have the configurations alpha, beta, then we get the row `[K^alpha_(beta, 1), ..., K^alpha_(beta, Nions)]`
+- `energy_matrix_element`: supply two sets of descriptors, from which then the corresponding matrixelements are build. For example, if descriptors of config1 and config2 are given, the output will be sum_i K^(1,i=1,..,Nions)_(2,j=1,...,Nions). If we supply one configuration and a full set of descriptors, then we get the corresponding row, which multiplied by the weights should give the energy.
 - `force_submat`: takes as input two configurations and just applies the correct submatrix (linear or gaussian) to them.
