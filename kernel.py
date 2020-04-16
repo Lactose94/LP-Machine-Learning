@@ -65,6 +65,7 @@ class Kernel:
     # builds a matrix-element for a given configuration
     # and !!one!! given descriptor vector (i.e. for !!one!! atom)
     def energy_matrix_elements(self, descr1: np.array, descr2: np.array) -> np.array:
+        # TODO: check sum
         sums =  np.sum(self.kernel(descr1, descr2), axis=0)
         return sums
     # builds part of the row of the energy kernel matrix
