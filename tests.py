@@ -114,22 +114,23 @@ class TestKernel(unittest.TestCase):
     def test_energy_matrix_element(self):
         conf = Configuration(positions=zeros((10, 3)), descriptors=eye(10, 10))
         kern = kernel.Kernel('linear')
-        zero_el = kern.energy_matrix_element(conf, zeros(10))
+        zero_el = kern.energy_matrix_elements(conf.descriptors, zeros(10))
         self.assertEqual(type(zero_el), float64)
         self.assertEqual(zero_el, 0)
 
         one = array([1] + [0 for _ in range(9)])
-        one_el = kern.energy_matrix_element(conf, one)
+        one_el = kern.energy_matrix_elements(conf.descriptors, one)
         self.assertEqual(one_el, 1)
 
         one = ones(10)
-        ten_el = kern.energy_matrix_element(conf, one)
+        ten_el = kern.energy_matrix_elements(conf.descriptors, one)
         self.assertEqual(ten_el, 10)
  
         five = 5 * one
-        fifty_el = kern.energy_matrix_element(conf, five)
+        fifty_el = kern.energy_matrix_elements(conf.descriptors, five)
         self.assertEqual(fifty_el, 50)
 
+    # TODO: rewrite to consider changes
     # tests if the shape and value of the subrow is correct
     def test_energy_subrow(self):
         conf1 = Configuration(positions=zeros((10, 3)), descriptors=eye(20, 10))
@@ -138,13 +139,13 @@ class TestKernel(unittest.TestCase):
         conf2 = Configuration(positions=zeros((10, 3)), descriptors=descr2)
 
         kern = kernel.Kernel('linear')
-        subrow = kern.energy_subrow(conf1, conf2)
+        subrow = kern.energy_matrix_elements(conf1.descriptors, conf2.descriptors)
         self.assertEqual(shape(subrow), (20, ))
         self.assertEqual(subrow[0], 1)
         self.assertTrue(array_equal(subrow[1:], zeros(19)))
 
         conf2.descriptors = eye(20, 10)
 
-        subrow = kern.energy_subrow(conf1, conf2)
+        subrow = kern.energy_matrix_elements(conf1.descriptors, conf2.descriptors)
         self.assertTrue(array_equal(subrow[:10], ones(10)))
         self.assertTrue(array_equal(subrow[10:], zeros(10)))

@@ -3,19 +3,31 @@ import numpy as np
 import configuration
 
 
-def linear_kernel(descr_list1: np.array, descr_list2: np.array) -> float:
-    if np.shape(descr_list1)[-1] != np.shape(descr_list2.T)[0]:
+def linear_kernel(descr_list1: np.array, descr_list2: np.array) -> np.array:
+    shape1 = np.shape(descr_list1)
+    shape2 = np.shape(descr_list2.T)
+
+    if (bool(shape1) ^ bool(shape2)):
+        raise ValueError('cannot apply to float and array')
+    elif (bool(shape1) ^ bool(shape2)) and not (shape1[-1] == shape2[0]):
         raise ValueError(f'Shapes of input do not match: {np.shape(descr_list1)} vs {np.shape(descr_list2.T)}')
 
-    return descr_list1 @ descr_list2.T
+    return np.dot(descr_list1, descr_list2.T)   
 
+# TODO: write decomposition into the mathematical documentation
+def gaussian_kernel(descr_list1: np.array, descr_list2: np.array, sigma: float) -> np.float:
 
-def gaussian_kernel(descriptor1: np.array, descriptor2: np.array, sigma: float) -> float:
-    if np.shape(descriptor1) != np.shape(descriptor2):
-        raise ValueError('Shapes of input do not match')
+    abs1 = linear_kernel(descr_list1, descr_list1)
+    if not np.size(abs1) == 1:
+        abs1 = np.diag(abs1)
 
-    dr = descriptor1 - descriptor2
-    return exp(dr.dot(dr) / (2 * sigma**2))
+    abs2 = linear_kernel(descr_list2, descr_list2)
+    if not np.size(abs2) == 1:
+        abs2 = np.diag(abs2)[:, np.newaxis]
+    coeffs = linear_kernel(descr_list1, descr_list2)
+
+    dr = abs1 - 2 * coeffs + abs2
+    return exp(dr/ (2 * sigma**2))
 
 
 # returns the scalar prefactor for the matrix element of the forces
@@ -68,14 +80,6 @@ class Kernel:
         # TODO: check sum
         sums =  np.sum(self.kernel(descr1, descr2), axis=0)
         return sums
-    # builds part of the row of the energy kernel matrix
-    def energy_subrow(self, config1: configuration, descriptors_array: np.array) -> np.array:
-        return np.apply_along_axis(
-            lambda x: self.energy_matrix_elements(config1, x),
-            arr=descriptors_array,
-            axis=1
-        )
-
 
     # applies the correct function to build the force submatrix
     def force_submat(self, q: np.array, config1: configuration, config2: configuration) -> np.array:
