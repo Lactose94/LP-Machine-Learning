@@ -6,6 +6,13 @@ from outcar_parser import Parser
 from configuration import Configuration
 import kernel
 
+def ridge_regression(K, E, lamb):
+    X = np.matmul(np.transpose(K),K)
+    y = np.matmul(np.transpose(K),E)
+    # X*w - y + lamb*w = 0
+    N = np.shape(K)[1]
+    w = np.matmul(np.linalg.inv(X + lamb * np.eye(N)) , y)
+    return w
 
 def main():
     # load the simulation parameters
@@ -75,7 +82,10 @@ def main():
                 )
     t1 = time()
     print(f'finished after {t1 - t0} s')
-
+    
+    # calculate the weights using ridge regression
+    w_E = ridge_regression(K, E, user_config['lambda'])
+    w_F = ridge_regression(T, F, user_config['lambda'])
     
 if __name__ == '__main__':
     main()
