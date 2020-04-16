@@ -4,10 +4,10 @@ import configuration
 
 
 def linear_kernel(descr_list1: np.array, descr_list2: np.array) -> float:
-    if np.shape(descr_list1)[0] != np.shape(descr_list2.T)[0]:
-        raise ValueError('Shapes of input do not match')
+    if np.shape(descr_list1)[-1] != np.shape(descr_list2.T)[0]:
+        raise ValueError(f'Shapes of input do not match: {np.shape(descr_list1)} vs {np.shape(descr_list2.T)}')
 
-    return descr_list1.dot(descr_list2.T)
+    return descr_list1 @ descr_list2.T
 
 
 def gaussian_kernel(descriptor1: np.array, descriptor2: np.array, sigma: float) -> float:
@@ -64,13 +64,13 @@ class Kernel:
 
     # builds a matrix-element for a given configuration
     # and !!one!! given descriptor vector (i.e. for !!one!! atom)
-    def energy_matrix_element(self, config: configuration, descriptors_array: np.array) -> float:
-        return sum(self.kernel(descriptors_array, config.descriptors))
-
+    def energy_matrix_elements(self, descr1: np.array, descr2: np.array) -> np.array:
+        sums =  np.sum(self.kernel(descr1, descr2), axis=0)
+        return sums
     # builds part of the row of the energy kernel matrix
     def energy_subrow(self, config1: configuration, descriptors_array: np.array) -> np.array:
         return np.apply_along_axis(
-            lambda x: self.energy_matrix_element(config1, x),
+            lambda x: self.energy_matrix_elements(config1, x),
             arr=descriptors_array,
             axis=1
         )

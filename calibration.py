@@ -64,8 +64,8 @@ def main():
         F[alpha*N_ion*3: (alpha+1)*N_ion*3] = configurations[alpha].forces.flatten()
         for beta in range(N_conf):
             print(f'{alpha+1}/{N_conf}; {beta+1}/{N_conf}           ', end='\r')
-            K[alpha, beta*N_ion: (beta+1)*N_ion] = kern.energy_subrow(
-                configurations[alpha],
+            K[alpha, beta*N_ion: (beta+1)*N_ion] = kern.energy_matrix_elements(
+                configurations[alpha].descriptors,
                 configurations[beta].descriptors
                 )
             T[alpha*N_ion*3:(alpha+1)*N_ion*3, beta*N_ion: (beta+1)*N_ion] = kern.force_submat(
