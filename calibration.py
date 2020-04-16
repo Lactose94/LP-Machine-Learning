@@ -87,5 +87,8 @@ def main():
     w_E = ridge_regression(K, E, user_config['lambda'])
     w_F = ridge_regression(T, F, user_config['lambda'])
     
+    # save calibration (file content will be overwritten if it already exists)
+    np.savetxt('calibration.out', (w_E, w_F))
+    
 if __name__ == '__main__':
     main()
