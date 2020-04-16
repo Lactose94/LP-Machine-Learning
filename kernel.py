@@ -46,10 +46,10 @@ class Kernel:
 
     # builds part of the row of the energy kernel matrix
     # NOTE: This will be easy to refactor. Just replace config2 by set of descriptors
-    def energy_subrow(self, config1: configuration, config2: configuration) -> np.array:
+    def energy_subrow(self, config1: configuration, descriptors_array: np.array) -> np.array:
         return np.apply_along_axis(
             lambda x: self.energy_matrix_element(config1, x),
-            arr=config2.descriptors,
+            arr=descriptors_array,
             axis=1
         )
 
