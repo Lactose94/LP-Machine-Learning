@@ -62,8 +62,8 @@ Das Programm überprüft nicht die Plausibilität der Eingabedaten. Diese werden
 
 ---
 Das Package enthält im Wesentlichen eine Funktion und eine Klasse: 
-### dist(r1, r2, a=1):
-Diese Funktion berechnet die Distanz der Positionen r1 und r2 nach der minimal image convention. Dabei ist a eine optionale Gitterkonstante, die mitgegeben werden muss wenn in kartesischen Koordinaten (im Gegensatz zu direkten Koordinaten) gerechnet wird.
+### difference(r1, r2, a=1):
+Diese Funktion berechnet den Distanzvektor der Positionen r1 und r2 nach der minimal image convention. Dabei ist a eine optionale Gitterkonstante, die mitgegeben werden muss wenn in kartesischen Koordinaten (im Gegensatz zu direkten Koordinaten) gerechnet wird.
 
 ### Die Configuration Klasse:
 Diese muss zumindest mit einer Positions-Matrix der Ionen initialisiert werden. Energie und Kräfte-Matrix sind optional, da diese nicht zwingend bekannt sind. Es ist auch möglich die nearesr-neigbour-tables ihrer Positionen und der Abstände gleich zu initialisieren, falls dies erwünscht ist. Die Klasse besitzt jedoch Methoden diese selbst zu berechnen. Dies gilt ebenso für die Descriptor-Koeffizienten.
@@ -71,13 +71,19 @@ Diese muss zumindest mit einer Positions-Matrix der Ionen initialisiert werden. 
 - `positions` enthält die Positionsmatrix der Ionen [Ionenindex, Raumkoordinatenindex] als 2d-numpy-array(float).
 - `energy` enthält die Energie der Konfiguration als float.
 - `forces` enthält die Kräftematrix der Ionen [Ionenindex, Raumkoordinatenindex] als 2d-numpy-array(float).
-- `nnpositions` enthält die nearest-neighbour-Positionsmatrix der Ionen als list(list(list(float))).
-- `nndistances` enthält die nearest-neighbour-Abständematrix der Ionen als list(list(float)).
+- `differences`: Numpy array mit den Differenzvektoren zwischen alle Ionen, hat daher die shape (Nion, Nion, 3)
+- `distances`: Numpy array mit den Abständen zwischen allen Ionen, hat die shape (Nion, Nion)
+- `NNlist`: Hier werden die NN indices gespeichert, so dass NNlist[i] die NN-indices der nearest neighbors enthält. Ist in einer form  gespeichert, in der direkt die Werte aus dem array abgerufen werden.
 - `descriptors` enthält die descriptor-Koeffizientenmatrix der Ionen [Ionenindex, qindex] als 2d-numpy-array(float).
 
 #### Methoden:
 - **init_NN(rcut, lattice)**:  
   Erstellt unter Übergabe eines cutoff-Radius rcut (float in Angstrom) und des Gitters lattice (float numpy array in Angstrom) die beiden konfigurationseigenen nearest-neighbour-tables nnpositions und nndistances. Dass der cutoff-Radius sinnvoll mit der Positionsmatrix zusammenpasst, also kleiner als die halbe Gitterkonstante ist, wird dabei vorausgesetzt aber nicht überprüft!
+
+- **get_NNdistances(i=None)**:
+  Gibt die NN-Abstände des Atoms i als array aus. Wenn kein index spezifiert wird, wird eine Liste für alle Atome erstellt.
+- **get_NNdifferences(i=None)**:
+  Gibt die NN-Differenzvektoren des Atoms i als array aus. Wenn kein index spezifiert wird, wird eine Liste für alle Atome erstellt
 - **init_descriptor(q)**:  
   Erstellt unter Übergabe eines q-Vektors (float) die descriptor-Koeffizientenmatrix. Dass der cutoff-Radius sinnvoll mit dem q-Vektor zusammenpasst wird dabei vorausgesetzt und nicht überprüft. Der descriptor-Koeffizient C_i für ein Ion i berechnet sich dabei wie folgt:
   
@@ -105,12 +111,16 @@ Der Benutzer legt dabei die Parameter des Machine Learnings durch einträge in d
 Dieses Package versucht die wesentlichen Funktionalitäten des Kernels zu fokussieren.
 ### Funktionen:
 - `linear_kernel(descriptor1: np.array, descriptor2: np.array) -> float`
-- `linear_grad(q: float, R1: np.array, R2: np.array, dr=None) -> np.array`. This returns the building block for the tensor, from which we will fit the forces. Can give the distance between the two input vectors, if it is already calculated. **Insert reference to mathematical documentation**
 - `gaussian_kernel(descriptor1: np.array, descriptor2: np.array, sigma: float) -> float`
+- `grad_scalar(q: float, dr: np.array) -> np.array:` Erstell aus einem Array aus Abständen die Vorfaktoren für die jeweiligen Differenzvektoren, die zu diesem abstand korrespondieren. 
+- `def linear_force_subrow(q: np.array, config1: configuration, descriptors_array: np.array) -> np.array:` Builds the force matrix elements for config1 given a set of descriptors, in the *linear* case. For example, if we have two configurations, then the function will build the matrix element T^(1,k=1,...,Nions, l=1...,3)_(2,i=1,...,Nions).
+If given a complete set of descriptors i.e (Nconf * Nions, n_q) it builds the rows of the coefficient matrix for the given configuration.
+
 ### Die Kernel-Klasse
 Diese dient als wrapper um die übrigen Funktionalität dem User gebündelt zur Verfügung zu stellen
 #### Variablen:
 - `kernel`: Enthält den gewünschten Kernel als Funktion.
 #### Methods
-- `matrix_element`: supply a set of descriptors for a configuration and **one element** of the set of **all** available configuration (vectors) and retrieve the corresponding matrix-element wrt the given kernel.
-- `build_subrow`: Takes as input two configurations and will return part of the row of the coefficient matrix. If we have the configurations alpha, beta, then we get the row `[K^alpha_(beta, 1), ..., K^alpha_(beta, Nions)]`
+- `energy_matrix_element`: supply a set of descriptors for a configuration and **one element** of the set of **all** available configuration (vectors) and retrieve the corresponding energy matrix-element wrt the given kernel.
+- `energy_subrow`: Takes as input two configurations and will return part of the row of the energy coefficient matrix. If we have the configurations alpha, beta, then we get the row `[K^alpha_(beta, 1), ..., K^alpha_(beta, Nions)]`
+- `force_submat`: takes as input two configurations and just applies the correct submatrix (linear or gaussian) to them.

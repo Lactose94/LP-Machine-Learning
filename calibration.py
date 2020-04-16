@@ -68,7 +68,7 @@ def main():
                 configurations[alpha],
                 configurations[beta].descriptors
                 )
-            T[alpha*N_ion*3:(alpha+1)*N_ion*3, beta*N_ion: (beta+1)*N_ion] = kern.force_subrow(
+            T[alpha*N_ion*3:(alpha+1)*N_ion*3, beta*N_ion: (beta+1)*N_ion] = kern.force_submat(
                 qs,
                 configurations[alpha],
                 configurations[beta]
