@@ -22,8 +22,8 @@ def gaussian_kernel(descriptor1: np.array, descriptor2: np.array, sigma: float) 
 def grad_scalar(q: float, dr: np.array) -> np.array:
     return q * np.cos(q * dr) / dr
 
-# TODO: implement different kernels
-# builds part of the row for the force kernel matrix
+
+# builds part of the row for the force kernel matrix given a configuration and a set of descriptors
 def linear_force_submat(q: np.array, config1: configuration, descriptors_array: np.array) -> np.array:
     nr_modi = len(q)
     n_ions, modi_config = np.shape(config1.descriptors)
@@ -65,12 +65,8 @@ class Kernel:
     # builds a matrix-element for a given configuration
     # and !!one!! given descriptor vector (i.e. for !!one!! atom)
     def energy_matrix_element(self, config: configuration, descriptor: np.array) -> float:
-        return sum(
-            np.apply_along_axis(
-                lambda x: self.kernel(descriptor, x),
-                arr=config.descriptors,
-                axis=1)
-        )
+        product = config.descriptors.dot(descriptor)
+        return sum(product)
 
     # builds part of the row of the energy kernel matrix
     def energy_subrow(self, config1: configuration, descriptors_array: np.array) -> np.array:
