@@ -78,6 +78,7 @@ class Kernel:
     # and !!one!! given descriptor vector (i.e. for !!one!! atom)
     def energy_matrix_elements(self, descr1: np.array, descr2: np.array) -> np.array:
         # TODO: check sum
+        # FIXME: this does not play well, if we want to completely flatten both input arrays. 
         sums =  np.sum(self.kernel(descr1, descr2), axis=0)
         return sums
 

@@ -38,7 +38,6 @@ class Parser:
     # Durchsucht den Inhalt nach dem Muster, dass den direkten lattice Vektoren vorangestellt ist.
     # Falls die entsprechende Zeile nicht auffindbar ist, bricht das Programm ab
     def find_lattice_vectors(self) -> array:
-        # TODO: ask in what shape the vectors are put in
         lattice_match = search(LATTICE_PATTERN,
                                 self.outcar_content, 
                                 IGNORECASE)
@@ -99,7 +98,6 @@ if __name__ == '__main__':
     assert nr_ions == 64, f'nr of ions should be 64, is {nr_ions}'
     assert array_equal(parser.find_lattice_vectors(), test_lattice), 'lattice vectors do not match'
 
-    # TODO: write test for reading of pos + forces
     i = 1
     for config in parser.build_configurations(1):
         print(config[0], i)
