@@ -129,7 +129,7 @@ class TestKernel(unittest.TestCase):
         five = 5 * one
         fifty_el = kern.energy_matrix_elements(conf.descriptors, five)
         self.assertEqual(fifty_el, 50)
-
+    # TODO: reflect changes in the code in test names
     # tests if the shape and value of the subrow is correct
     # TODO: check shapes more
     def test_energy_subrow(self):
