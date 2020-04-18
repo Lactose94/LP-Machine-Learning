@@ -89,6 +89,7 @@ def main():
     print('Solving linear system')
     w_E = ridge_regression(K, E, user_config['lambda'])
     w_F = ridge_regression(T, F, user_config['lambda'])
+    t1 = time()
     print(f'finished after {t1 - t0} s')
     
     # save calibration (file content will be overwritten if it already exists)
