@@ -77,7 +77,7 @@ def main():
         T[alpha*N_ion*3:(alpha+1)*N_ion*3] = kernel.linear_force_submat(qs, configurations[alpha], descr)
 
     K = kernel.linear_kernel(descr, descr)
-    k = np.sum(
+    K = np.sum(
         K.reshape(N_conf, N_ion, N_conf * N_ion),
         axis=1
     )
@@ -85,8 +85,8 @@ def main():
     print(f'finished after {t1 - t0} s')
     
     # calculate the weights using ridge regression
-    #w_E = ridge_regression(K, E, user_config['lambda'])
-    #w_F = ridge_regression(T, F, user_config['lambda'])
+    w_E = ridge_regression(K, E, user_config['lambda'])
+    w_F = ridge_regression(T, F, user_config['lambda'])
     
     # save calibration (file content will be overwritten if it already exists)
     #np.savetxt('calibration.out', (w_E, w_F))
