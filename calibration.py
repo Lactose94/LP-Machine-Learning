@@ -9,9 +9,9 @@ import kernel
 def ridge_regression(K, E, lamb):
     X = np.matmul(np.transpose(K),K)
     y = np.matmul(np.transpose(K),E)
-    # X*w - y + lamb*w = 0
+    # (X+lamb*I) * w - y = 0
     N = np.shape(K)[1]
-    w = np.matmul(np.linalg.inv(X + lamb * np.eye(N)) , y)
+    w = np.linalg.solve(X + lamb * np.eye(N), y) # faster than: w = np.matmul(np.linalg.inv(X + lamb * np.eye(N)) , y)
     return w
 
 def main():
@@ -83,7 +83,7 @@ def main():
     t1 = time()
     print(f'finished after {t1-t0:.3} s')
     
-    to = time()
+    t0 = time()
     # calculate the weights using ridge regression
     print('Solving linear system')
     w_E = ridge_regression(K, E, user_config['lambda'])
