@@ -1,6 +1,6 @@
 import unittest
 from math import exp, sqrt
-from numpy import array, array_equal, ones, zeros, eye, float64, shape
+from numpy import array, array_equal, ones, zeros, eye, float64, shape, sqrt
 from outcar_parser import Parser
 from configuration import Configuration
 import kernel
@@ -112,40 +112,42 @@ class TestKernel(unittest.TestCase):
 
     # tests if the shape and value of the matrix element is the expected
     def test_energy_matrix_element(self):
-        conf = Configuration(positions=zeros((10, 3)), descriptors=eye(10, 10))
         kern = kernel.Kernel('linear')
-        zero_el = kern.energy_matrix_elements(conf.descriptors, zeros(10))
+        descr1 = eye(10, 10)
+        zero_el = kern.energy_matrix_elements(descr1, zeros(10))
         self.assertEqual(type(zero_el), float64)
         self.assertEqual(zero_el, 0)
 
         one = array([1] + [0 for _ in range(9)])
-        one_el = kern.energy_matrix_elements(conf.descriptors, one)
+        one_el = kern.energy_matrix_elements(descr1, one)
         self.assertEqual(one_el, 1)
 
         one = ones(10)
-        ten_el = kern.energy_matrix_elements(conf.descriptors, one)
+        ten_el = kern.energy_matrix_elements(descr1, one)
         self.assertEqual(ten_el, 10)
  
         five = 5 * one
-        fifty_el = kern.energy_matrix_elements(conf.descriptors, five)
+        fifty_el = kern.energy_matrix_elements(descr1, five)
         self.assertEqual(fifty_el, 50)
     # TODO: reflect changes in the code in test names
     # tests if the shape and value of the subrow is correct
     # TODO: check shapes more
     def test_energy_subrow(self):
-        conf1 = Configuration(positions=zeros((10, 3)), descriptors=eye(20, 10))
+        descr1=eye(20, 10)
         descr2 = zeros((20, 10))
         descr2[0, 0] = 1
-        conf2 = Configuration(positions=zeros((10, 3)), descriptors=descr2)
 
         kern = kernel.Kernel('linear')
-        subrow = kern.energy_matrix_elements(conf1.descriptors, conf2.descriptors)
+        subrow = kern.energy_matrix_elements(descr1, descr2)
         self.assertEqual(shape(subrow), (20, ))
         self.assertEqual(subrow[0], 1)
         self.assertTrue(array_equal(subrow[1:], zeros(19)))
 
-        conf2.descriptors = eye(20, 10)
+        descr2 = eye(20, 10)
 
-        subrow = kern.energy_matrix_elements(conf1.descriptors, conf2.descriptors)
+        subrow = kern.energy_matrix_elements(descr1, descr2)
         self.assertTrue(array_equal(subrow[:10], ones(10)))
         self.assertTrue(array_equal(subrow[10:], zeros(10)))
+
+        kern = kernel.Kernel('gaussian', 1/sqrt(2))
+        #exp_eye = kern.energy_matrix_elements()
