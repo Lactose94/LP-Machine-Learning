@@ -92,7 +92,7 @@ def main():
     print(f'finished after {t1 - t0} s')
     
     # save calibration (file content will be overwritten if it already exists)
-    #np.savetxt('calibration.out', (w_E, w_F))
+    np.savetxt('calibration.out', (w_E, w_F))
     
 if __name__ == '__main__':
     main()
