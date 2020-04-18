@@ -1,6 +1,6 @@
 import unittest
 from math import exp, sqrt
-from numpy import array, array_equal, ones, zeros, eye, float64, shape, sqrt
+import numpy as np
 from outcar_parser import Parser
 from configuration import Configuration
 import kernel
@@ -30,14 +30,14 @@ class TestParser(unittest.TestCase):
     def test_read_lattice_vecors(self):
         test_in = 'OUTCAR.21'
         parser = Parser(test_in)
-        test_lattice = array([
+        test_lattice = np.array([
             [10.546640000, 0.000000000, 0.000000000],
             [0.000000000, 10.546640000, 0.000000000],
             [0.000000000, 0.000000000, 10.546640000]
             ])
 
         self.assertTrue(
-            array_equal(parser.find_lattice_vectors(), test_lattice), 'lattice vectors do not match'
+            np.array_equal(parser.find_lattice_vectors(), test_lattice), 'lattice vectors do not match'
             )
 
     def test_warn_not_cubic(self):
@@ -65,8 +65,8 @@ class TestParser(unittest.TestCase):
     def test_read_pos_force_energy(self):
         test_in = 'OUTCAR.21'
 
-        g_pos = array([2.26725, 2.36995, 0.06367])
-        g_force = array([-0.171492, -0.290427, -1.773642])
+        g_pos = np.array([2.26725, 2.36995, 0.06367])
+        g_force = np.array([-0.171492, -0.290427, -1.773642])
         g_energy = -306.41169589
 
         parser = Parser(test_in)
@@ -78,8 +78,8 @@ class TestParser(unittest.TestCase):
         self.assertEqual(nr_of_configs, 1000, 'does not return the correct number of configs')
 
         for energy, position, force in parser.build_configurations(1000):
-            self.assertTrue(array_equal(position[0], g_pos), 'returns wrong position')
-            self.assertTrue(array_equal(force[0], g_force), 'returns wrong force')
+            self.assertTrue(np.array_equal(position[0], g_pos), 'returns wrong position')
+            self.assertTrue(np.array_equal(force[0], g_force), 'returns wrong force')
             self.assertEqual(energy, g_energy, 'returns wrong energy')
 
 
@@ -97,11 +97,11 @@ class TestCalibration(unittest.TestCase):
 class TestKernel(unittest.TestCase):
     # Tests if the shape and value of the kernel-fcts is the expected
     def test_kernel_values(self):
-        self.assertEqual(kernel.linear_kernel(array(1), array(0)), 0)
-        self.assertEqual(kernel.linear_kernel(ones(10), ones(10)), 10)
+        self.assertEqual(kernel.linear_kernel(np.array(1), np.array(0)), 0)
+        self.assertEqual(kernel.linear_kernel(np.ones(10), np.ones(10)), 10)
 
-        self.assertEqual(kernel.gaussian_kernel(zeros(10), zeros(10), 10), 1)
-        self.assertAlmostEqual(kernel.gaussian_kernel(array([sqrt(2)*3, 0]), zeros(2), 3), exp(1), 7)
+        self.assertEqual(kernel.gaussian_kernel(np.zeros(10), np.zeros(10), 10), 1)
+        self.assertAlmostEqual(kernel.gaussian_kernel(np.array([sqrt(2)*3, 0]), np.zeros(2), 3), exp(1), 7)
 
     # Test if choosing the kernel works and panics if no sigma is given
     def test_kernel_choice(self):
@@ -110,44 +110,69 @@ class TestKernel(unittest.TestCase):
         with self.assertRaises(ValueError):
             kernel.Kernel('gaussian')
 
-    # tests if the shape and value of the matrix element is the expected
-    def test_energy_matrix_element(self):
+    # tests if the value of the matrix element is the expected
+    def test_linear_energy_matrix_element(self):
         kern = kernel.Kernel('linear')
-        descr1 = eye(10, 10)
-        zero_el = kern.energy_matrix_elements(descr1, zeros(10))
-        self.assertEqual(type(zero_el), float64)
+        descr1 = np.eye(10, 10)
+        zero_el = kern.energy_matrix_elements(descr1, np.zeros(10))
+        self.assertEqual(type(zero_el), np.float64)
         self.assertEqual(zero_el, 0)
 
-        one = array([1] + [0 for _ in range(9)])
+        one = np.array([1] + [0 for _ in range(9)])
         one_el = kern.energy_matrix_elements(descr1, one)
         self.assertEqual(one_el, 1)
 
-        one = ones(10)
+        one = np.ones(10)
         ten_el = kern.energy_matrix_elements(descr1, one)
         self.assertEqual(ten_el, 10)
  
         five = 5 * one
         fifty_el = kern.energy_matrix_elements(descr1, five)
         self.assertEqual(fifty_el, 50)
-    # TODO: reflect changes in the code in test names
+
+    def test_linear_energy_matrix_shape(self):
+        desc1 = np.ones((50, 5))
+        desc2 = np.ones((400, 5))
+
+        shape = np.shape(kernel.linear_kernel(desc1, desc2))
+        self.assertEqual(shape, (50, 400))
+
+    def test_gaussian_energy_matrix_shape(self):
+        desc1 = np.ones((50, 5))
+        desc2 = np.ones((400, 5))
+
+        shape = np.shape(kernel.gaussian_kernel(desc1, desc2, 1))
+        self.assertEqual(shape, (50, 400))
+
+    def test_linear_energy_matrix_values(self):
+        kern = kernel.Kernel('linear')
+        expected_val = np.eye(10)
+
+        lin_eye = kern.kernel(np.eye(10), np.eye(10))
+        self.assertTrue(np.array_equal(lin_eye, expected_val))
+
+    def test_gaussian_energy_matrix_values(self):
+        kern = kernel.Kernel('gaussian', 1)
+        expected_val = np.ones((10, 10)) * exp(1)
+        np.fill_diagonal(expected_val, 1)
+
+        exp_eye = kern.kernel(np.eye(10), np.eye(10))
+        self.assertTrue(np.array_equal(exp_eye, expected_val))
     # tests if the shape and value of the subrow is correct
-    # TODO: check shapes more
-    def test_energy_subrow(self):
-        descr1=eye(20, 10)
-        descr2 = zeros((20, 10))
+    def test_linear_energy_subrow(self):
+        descr1 = np.eye(20, 10)
+        descr2 = np.zeros((20, 10))
         descr2[0, 0] = 1
 
         kern = kernel.Kernel('linear')
         subrow = kern.energy_matrix_elements(descr1, descr2)
-        self.assertEqual(shape(subrow), (20, ))
+        self.assertEqual(np.shape(subrow), (20, ))
         self.assertEqual(subrow[0], 1)
-        self.assertTrue(array_equal(subrow[1:], zeros(19)))
+        self.assertTrue(np.array_equal(subrow[1:], np.zeros(19)))
 
-        descr2 = eye(20, 10)
+        descr2 = np.eye(20, 10)
 
         subrow = kern.energy_matrix_elements(descr1, descr2)
-        self.assertTrue(array_equal(subrow[:10], ones(10)))
-        self.assertTrue(array_equal(subrow[10:], zeros(10)))
+        self.assertTrue(np.array_equal(subrow[:10], np.ones(10)))
+        self.assertTrue(np.array_equal(subrow[10:], np.zeros(10)))
 
-        kern = kernel.Kernel('gaussian', 1/sqrt(2))
-        #exp_eye = kern.energy_matrix_elements()
