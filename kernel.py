@@ -6,12 +6,13 @@ def linear_kernel(descr_list1: np.array, descr_list2: np.array) -> np.array:
     shape1 = np.shape(descr_list1)
     shape2 = np.shape(descr_list2.T)
 
-    if (bool(shape1) ^ bool(shape2)):
+    if bool(shape1) ^ bool(shape2):
         raise ValueError('cannot apply to float and array')
-    elif (bool(shape1) ^ bool(shape2)) and not (shape1[-1] == shape2[0]):
+    elif (bool(shape1) ^ bool(shape2)) and not shape1[-1] == shape2[0]:
         raise ValueError(f'Shapes of input do not match: {np.shape(descr_list1)} vs {np.shape(descr_list2.T)}')
 
-    return np.dot(descr_list1, descr_list2.T)   
+    return np.dot(descr_list1, descr_list2.T)
+
 
 # TODO: write decomposition into the mathematical documentation
 # TODO: check if something's up with the diagonal elements
@@ -27,7 +28,7 @@ def gaussian_kernel(descr_list1: np.array, descr_list2: np.array, sigma: float) 
     coeffs = linear_kernel(descr_list1, descr_list2)
 
     dr = abs1 - 2 * coeffs + abs2
-    return np.exp(dr/ (2 * sigma**2))
+    return np.exp(dr / (2 * sigma**2))
 
 
 # returns the scalar prefactor for the matrix element of the forces
@@ -44,7 +45,7 @@ def linear_force_submat(q: np.array, config1: configuration, descriptors_array: 
 
     if not nr_modi == modi_config == modi_desc:
         raise ValueError('The nr of q\'s does not match')
-    
+
     submat = np.zeros((n_ions * dim, nr_descriptors))
 
     for l in range(nr_modi):
@@ -79,8 +80,8 @@ class Kernel:
     # and !!one!! given descriptor vector (i.e. for !!one!! atom)
     def energy_matrix_elements(self, descr1: np.array, descr2: np.array) -> np.array:
         # TODO: check sum
-        # FIXME: this does not play well, if we want to completely flatten both input arrays. 
-        sums =  np.sum(self.kernel(descr1, descr2), axis=0)
+        # FIXME: this does not play well, if we want to completely flatten both input arrays.
+        sums = np.sum(self.kernel(descr1, descr2), axis=0)
         return sums
 
     # applies the correct function to build the force submatrix
