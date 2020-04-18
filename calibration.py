@@ -55,7 +55,7 @@ def main():
         print(f'{ctr}/{N_conf}', end='\r')
         ctr += 1
     t1 = time()
-    print(f'finished after {t1 - t0} s')
+    print(f'finished after {t1-t0:.3} s')
     # will be the super vectors
     E = np.zeros(N_conf)
     # this holds the matrix-elements in the shape [sum_j K(C^beta_j, C^alpha_i)]^beta_(alpha, i)
@@ -81,12 +81,15 @@ def main():
                 configurations[beta]
                 )
     t1 = time()
-    print(f'finished after {t1 - t0} s')
+    print(f'finished after {t1-t0:.3} s')
     
+    to = time()
     # calculate the weights using ridge regression
+    print('Solving linear system')
     w_E = ridge_regression(K, E, user_config['lambda'])
     w_F = ridge_regression(T, F, user_config['lambda'])
-    
+    t1 = time()
+    print(f'finished after {t1-t0:.3} s')
     # save calibration (file content will be overwritten if it already exists)
     np.savetxt('calibration.out', (w_E, w_F))
     
