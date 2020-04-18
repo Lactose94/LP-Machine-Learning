@@ -74,9 +74,9 @@ def main():
         print(f'{alpha+1}/{N_conf}', end='\r')
         E[alpha] = configurations[alpha].energy
         F[alpha*N_ion*3: (alpha+1)*N_ion*3] = configurations[alpha].forces.flatten()
-        T[alpha*N_ion*3:(alpha+1)*N_ion*3] = kernel.linear_force_submat(qs, configurations[alpha], descr)
+        T[alpha*N_ion*3:(alpha+1)*N_ion*3] = kern.force_mat(qs, configurations[alpha], descr)
 
-    K = kernel.linear_kernel(descr, descr)
+    K = kern.kernel(descr, descr)
     K = np.sum(
         K.reshape(N_conf, N_ion, N_conf * N_ion),
         axis=1

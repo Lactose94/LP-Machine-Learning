@@ -71,6 +71,8 @@ class Kernel:
             if not args:
                 raise ValueError('For the Gaussian Kernel a sigma has to be supplied')
             self.kernel = lambda x, y: gaussian_kernel(x, y, args[0])
+            # TODO: Put in correct value for the gaussian force!
+            self.force_mat = lambda x: x
         else:
             raise ValueError(f'kernel {mode} is not supported')
 
