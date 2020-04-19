@@ -46,19 +46,15 @@ def main():
     N_conf = len(configurations)
 
     # calculate the nearest neighbors and the descriptors
-    print('calculating NN and descriptors')
-
     t0 = time()
-
     # All descriptors in compact super-matrix
     C = np.zeros([N_conf, N_ion, user_config['nr_modi']])
     for (alpha, config) in enumerate(configurations):
         config.init_nn(user_config['cutoff'], lattice_vectors)
         config.init_descriptor(qs)
         C[alpha, :, :] = config.descriptors
-        print(f'{alpha+1}/{N_conf}', end='\r')
-    t1 = time()
-    print(f'finished after {t1-t0:.3} s')
+        print(f'calculating NN and descriptors: {alpha+1}/{N_conf}', end='\r')
+    print(f'calculating NN and descriptors: finished after {time()-t0:.3} s')
     
     # will be the super vectors
     E = np.zeros(N_conf)
@@ -71,9 +67,8 @@ def main():
     # build the linear system
     descr = C.reshape(N_conf * N_ion, len(qs))
     t0 = time()
-    print('Building linear system')
     for alpha in range(N_conf):
-        print(f'{alpha+1}/{N_conf}', end='\r')
+        print(f'Building linear system: {alpha+1}/{N_conf}', end='\r')
         E[alpha] = configurations[alpha].energy
         F[alpha*N_ion*3: (alpha+1)*N_ion*3] = configurations[alpha].forces.flatten()
         T[alpha*N_ion*3:(alpha+1)*N_ion*3] = kern.force_mat(qs, configurations[alpha], descr)
@@ -83,12 +78,11 @@ def main():
         K.reshape(N_conf, N_ion, N_conf * N_ion),
         axis=1
     )
-    t1 = time()
-    print(f'finished after {t1-t0:.3} s')
+    print(f'Building linear system: finished after {time()-t0:.3} s')
     
     t0 = time()
     # calculate the weights using ridge regression
-    print('Solving linear system')
+    print('Solving linear system: ', end='')
     w_E = ridge_regression(K, E, user_config['lambda'])
     w_F = ridge_regression(T, F, user_config['lambda'])
     t1 = time()
