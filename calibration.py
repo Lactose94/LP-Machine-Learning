@@ -46,14 +46,17 @@ def main():
     N_conf = len(configurations)
 
     # calculate the nearest neighbors and the descriptors
-    ctr = 1
     print('calculating NN and descriptors')
     t0 = time()
+    # All descriptors in compact super-matrix
+    C = np.zeros([N_conf, N_ion, user_config['nr_modi']])
+    ctr = 0
     for config in configurations:
         config.init_nn(user_config['cutoff'], lattice_vectors)
         config.init_descriptor(qs)
-        print(f'{ctr}/{N_conf}', end='\r')
+        C[ctr, :, :] = config.descriptors
         ctr += 1
+        print(f'{ctr}/{N_conf}', end='\r')
     t1 = time()
     print(f'finished after {t1-t0:.3} s')
     # will be the super vectors
@@ -90,8 +93,11 @@ def main():
     w_F = ridge_regression(T, F, user_config['lambda'])
     t1 = time()
     print(f'finished after {t1-t0:.3} s')
-    # save calibration (file content will be overwritten if it already exists)
-    np.savetxt('calibration.out', (w_E, w_F))
+    
+    # save calibration (file content will be overwritten if file already exists)
+    np.savetxt('calibration_w.out', (w_E, w_F))
+    np.savetxt('calibration_C.out', np.reshape(C, (N_conf, N_ion * user_config['nr_modi'])))
+    # loading: C_cal = np.reshape(np.loadtxt('calibration.out'), (N_conf, N_ion, user_config['nr_modi']))
     
 if __name__ == '__main__':
     main()
