@@ -47,42 +47,42 @@ def main():
 
     # calculate the nearest neighbors and the descriptors
     print('calculating NN and descriptors')
+
     t0 = time()
+
     # All descriptors in compact super-matrix
     C = np.zeros([N_conf, N_ion, user_config['nr_modi']])
-    ctr = 0
-    for config in configurations:
+    for (alpha, config) in enumerate(configurations):
         config.init_nn(user_config['cutoff'], lattice_vectors)
         config.init_descriptor(qs)
-        C[ctr, :, :] = config.descriptors
-        ctr += 1
-        print(f'{ctr}/{N_conf}', end='\r')
+        C[alpha, :, :] = config.descriptors
+        print(f'{alpha+1}/{N_conf}', end='\r')
     t1 = time()
     print(f'finished after {t1-t0:.3} s')
+    
     # will be the super vectors
     E = np.zeros(N_conf)
     # this holds the matrix-elements in the shape [sum_j K(C^beta_j, C^alpha_i)]^beta_(alpha, i)
     K = np.zeros((N_conf, N_conf * N_ion))
     # Holds forces flattened
     F = np.zeros(N_conf * N_ion * 3)
-    T = np.zeros((N_conf * N_ion * 3, N_conf * N_ion))
-    t0 = time()
+    T = np.zeros((N_conf * N_ion * 3, N_conf * N_ion))    
+
     # build the linear system
+    descr = C.reshape(N_conf * N_ion, len(qs))
+    t0 = time()
     print('Building linear system')
     for alpha in range(N_conf):
+        print(f'{alpha+1}/{N_conf}', end='\r')
         E[alpha] = configurations[alpha].energy
         F[alpha*N_ion*3: (alpha+1)*N_ion*3] = configurations[alpha].forces.flatten()
-        for beta in range(N_conf):
-            print(f'{alpha+1}/{N_conf}; {beta+1}/{N_conf}           ', end='\r')
-            K[alpha, beta*N_ion: (beta+1)*N_ion] = kern.energy_matrix_elements(
-                configurations[alpha].descriptors,
-                configurations[beta].descriptors
-                )
-            T[alpha*N_ion*3:(alpha+1)*N_ion*3, beta*N_ion: (beta+1)*N_ion] = kern.force_submat(
-                qs,
-                configurations[alpha],
-                configurations[beta]
-                )
+        T[alpha*N_ion*3:(alpha+1)*N_ion*3] = kern.force_mat(qs, configurations[alpha], descr)
+
+    K = kern.kernel(descr, descr)
+    K = np.sum(
+        K.reshape(N_conf, N_ion, N_conf * N_ion),
+        axis=1
+    )
     t1 = time()
     print(f'finished after {t1-t0:.3} s')
     
@@ -93,6 +93,7 @@ def main():
     w_F = ridge_regression(T, F, user_config['lambda'])
     t1 = time()
     print(f'finished after {t1-t0:.3} s')
+
     
     # save calibration (file content will be overwritten if file already exists)
     np.savetxt('calibration_w.out', (w_E, w_F))
