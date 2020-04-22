@@ -29,7 +29,7 @@ class Configuration(object):
     # Diese Funktion erstellt die nearest-neighbour-tables für die Positionen und die Abstände.
     # Dafür muss die float-Variable rcut in Angström übergeben werden.
     def init_nn(self, rcut, lattice):
-        n = np.shape(self.positions)[0]
+        n = np.shape(self.positions)[0] # nr of atoms
         self.nndisplacements = [[] for i in range(n)] # n lists of variable length inside a list
         self.nndistances = [[] for i in range(n)] # n lists of variable length inside a list
         
@@ -37,6 +37,7 @@ class Configuration(object):
         a = lattice.diagonal()
             
         for i in range(n): # loop over central atoms
+            # IDEA: temporary python lists, distances and distance vecs
             for j in range(i+1,n): # loop over possible nearest neighbours
                 rj_ri = dist(self.positions[i,:], self.positions[j,:], a)
                 dr = np.sqrt(rj_ri.dot(rj_ri))
@@ -46,7 +47,8 @@ class Configuration(object):
                     self.nndisplacements[j].append(-rj_ri) # NN atom - central atom
                     self.nndistances[i].append(dr)
                     self.nndistances[j].append(dr)
-        
+            # IDEA: convert temporary to np.array
+
     # Diese Funktion erstellt die descriptor coefficients der configuration.
     # Dafür muss ein float-Vektor q übergeben werden.
     # Dass dieser mit rcut zusammenpasst wird vorausgesetzt und nicht weiter überprüft.
@@ -60,7 +62,7 @@ class Configuration(object):
             self.descriptors = np.zeros((m, n))
             for i in range(0,m): # loop over central atoms
                 nrnn = np.size(self.nndistances[i]) # number of nearest neighbours for atom i
-                # TODO: optimize these two loops
+                # TODO: optimize these two loops 
                 for j in range(0,n): # loop over q
                     for k in range(0,nrnn): # loop over nearest neighbours of atom i
                         self.descriptors[i,j] += np.sin(q[j] * self.nndistances[i][k])

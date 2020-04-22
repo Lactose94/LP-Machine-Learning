@@ -48,6 +48,9 @@ def linear_force_submat(q: np.array, config1: configuration, descriptors_array: 
 
     submat = np.zeros((n_ions * dim, nr_descriptors))
 
+    # IDEA: multiproccessing/ray to parallelize this loop -> interchange loops to have the 
+    # longer loop para. 
+    # WARNING: Only the outer loop
     for l in range(nr_modi):
         # build the scalar prefactor for each distance vector
         # IDEA: rewrite the next few lines, s.t. it calculates the forces directly?

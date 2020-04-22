@@ -11,6 +11,7 @@ def ridge_regression(K, E, lamb):
     y = np.matmul(np.transpose(K),E)
     # (X+lamb*I) * w - y = 0
     N = np.shape(K)[1]
+    # IDEA: sklearn ridge-regression has several solving algorithms, maybe faster.
     w = np.linalg.solve(X + lamb * np.eye(N), y) # faster than: w = np.matmul(np.linalg.inv(X + lamb * np.eye(N)) , y)
     return w
 
