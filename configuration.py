@@ -10,14 +10,10 @@ import numpy as np
 def dist(r1, r2, a=1):
     dr = r2 - r1
     dr = dr - a * np.rint(dr/a) # rint = rounding to nearest integer (up or down)
-    #magnitude = np.sqrt(dr.dot(dr))
     return dr
 
 class Configuration(object):
     
-    # Es wäre gut, wenn wir beim parser die Reihenfolge (positions, energy, forces) verwenden würden,
-    # da wir nur bei der Kalibration alle 3 haben. Bei der Anwendung hätten wir nur mehr Positions
-    # (daher energy und forces in der Klasse configurations mit None).
     def __init__(self, positions, energy=None, forces=None, nndisplacements=None, nndistances=None, descriptors=None):
         self.positions = positions
         self.energy = energy
@@ -37,7 +33,6 @@ class Configuration(object):
         a = lattice.diagonal()
             
         for i in range(n): # loop over central atoms
-            # IDEA: temporary python lists, distances and distance vecs
             for j in range(i+1,n): # loop over possible nearest neighbours
                 rj_ri = dist(self.positions[i,:], self.positions[j,:], a)
                 dr = np.sqrt(rj_ri.dot(rj_ri))
