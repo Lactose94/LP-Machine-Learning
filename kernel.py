@@ -57,9 +57,9 @@ def linear_force_submat(q: np.array, config1: configuration, descriptors_array: 
         summands = np.zeros((n_ions, dim))
         for k in range(n_ions):
             # IDEA: do not cast to array
-            factor = grad_scalar(q[l], np.array(config1.nndistances[k]))
+            factor = grad_scalar(q[l], config1.nndistances[k])
             summands[k] = np.sum(
-                factor[:, np.newaxis] * np.array(config1.nndisplacements[k]),
+                factor[:, np.newaxis] * config1.nndisplacements[k],
                 axis=0
             )
 
