@@ -62,11 +62,7 @@ class Configuration(object):
             n = np.size(q)
             self.descriptors = np.zeros((m, n))
             for i in range(0,m): # loop over central atoms
-                nrnn = np.size(self.nndistances[i]) # number of nearest neighbours for atom i
-                # TODO: optimize these two loops 
-                for j in range(0,n): # loop over q
-                    for k in range(0,nrnn): # loop over nearest neighbours of atom i
-                        self.descriptors[i,j] += np.sin(q[j] * self.nndistances[i][k])
+                self.descriptors[i,:] = np.sum(np.sin(np.tensordot(q, self.nndistances[i], axes=0)), axis=1)
         return
             
 if __name__ == '__main__':
