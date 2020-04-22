@@ -30,8 +30,8 @@ class Configuration(object):
     # Dafür muss die float-Variable rcut in Angström übergeben werden.
     def init_nn(self, rcut, lattice):
         n = np.shape(self.positions)[0] # nr of atoms
-        self.nndisplacements = [[] for i in range(n)] # n lists of variable length inside a list
-        self.nndistances = [[] for i in range(n)] # n lists of variable length inside a list
+        self.nndisplacements = [[] for i in range(n)] # n lists of variable length inside a list -> later conversion to list of numpy.arrays
+        self.nndistances = [[] for i in range(n)] # n lists of variable length inside a list -> later conversion to list of numpy.arrays
         
         # get a vector of all lattice constants (primitive orthorhombic or cubic cell)
         a = lattice.diagonal()
@@ -41,13 +41,14 @@ class Configuration(object):
             for j in range(i+1,n): # loop over possible nearest neighbours
                 rj_ri = dist(self.positions[i,:], self.positions[j,:], a)
                 dr = np.sqrt(rj_ri.dot(rj_ri))
-                # IDEA: calculate the descriptors here
                 if dr < rcut:
                     self.nndisplacements[i].append(rj_ri) # NN atom - central atom
                     self.nndisplacements[j].append(-rj_ri) # NN atom - central atom
                     self.nndistances[i].append(dr)
                     self.nndistances[j].append(dr)
-            # IDEA: convert temporary to np.array
+            self.nndisplacements[i] = np.array(self.nndisplacements[i]) # type conversion from list to numpy-array
+            self.nndistances[i] = np.array(self.nndistances[i]) # type conversion from list to numpy-array
+            # IDEA: calculate the descriptors here
 
     # Diese Funktion erstellt die descriptor coefficients der configuration.
     # Dafür muss ein float-Vektor q übergeben werden.
@@ -86,6 +87,7 @@ if __name__ == '__main__':
     config1.init_nn(rcut, lattice)
     print(config1.nndisplacements)
     print(config1.nndistances)
+    print(type(config1.nndistances[0]))
     
     # test init_descriptor
     config1.init_descriptor(q)
