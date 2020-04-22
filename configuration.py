@@ -40,6 +40,7 @@ class Configuration(object):
             for j in range(i+1,n): # loop over possible nearest neighbours
                 rj_ri = dist(self.positions[i,:], self.positions[j,:], a)
                 dr = np.sqrt(rj_ri.dot(rj_ri))
+                # IDEA: calculate the descriptors here
                 if dr < rcut:
                     self.nndisplacements[i].append(rj_ri) # NN atom - central atom
                     self.nndisplacements[j].append(-rj_ri) # NN atom - central atom
