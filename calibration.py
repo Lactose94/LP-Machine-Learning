@@ -39,6 +39,7 @@ def main():
         raise ValueError('Cutoff cannot be bigger than half the lattice constants')
 
     # build the configurations from the parser
+    # IDEA: Build training set.
     configurations = [
         Configuration(position, energy, force) for (energy, position, force) in parser
         .build_configurations(user_config['stepsize'])
@@ -83,6 +84,7 @@ def main():
     
     t0 = time()
     # calculate the weights using ridge regression
+    # IDEA: get quality of the fit with the sklearn function
     print('Solving linear system: ', end='')
     w_E = ridge_regression(K, E, user_config['lambda'])
     w_F = ridge_regression(T, F, user_config['lambda'])
