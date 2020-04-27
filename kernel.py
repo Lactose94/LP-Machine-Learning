@@ -34,18 +34,7 @@ def gaussian_kernel(descr_list1: np.array, descr_list2: np.array, sigma: float) 
 def grad_scalar(q: float, dr: np.array) -> np.array:
     return q * np.cos(q * dr) / dr
 
-@ray.remote
-def linear_force_summands(nn_dist, nn_displ, q, descriptors_array, l, n_ions, dim):
-    summands = np.zeros((n_ions, dim))
-    for k in range(n_ions):
-        # build the scalar prefactor for each distance vector
-        factor = grad_scalar(q, nn_dist[k])
-        summands[k] = np.sum(
-            factor[:, np.newaxis] * nn_displ[k],
-            axis=0
-        )
-
-    return (descriptors_array[:, l, np.newaxis] * summands.flatten()).T
+@ ray.remote
 # builds part of the row for the force kernel matrix given a configuration and a set of descriptors
 def linear_force_submat(q: np.array, config1: configuration, descriptors_array: np.array) -> np.array:
     nr_modi = len(q)
@@ -57,21 +46,34 @@ def linear_force_submat(q: np.array, config1: configuration, descriptors_array: 
         raise ValueError('The nr of q\'s does not match')
 
 
+    nr_modi = len(q)
+    n_ions, modi_config = np.shape(config1.descriptors)
+    _, dim = np.shape(config1.positions)
+    nr_descriptors, modi_desc = np.shape(descriptors_array)
+
+    if not nr_modi == modi_config == modi_desc:
+        raise ValueError('The nr of q\'s does not match')
+
+    submat = np.zeros((n_ions * dim, nr_descriptors))
+
     # IDEA: multiproccessing/ray to parallelize this loop -> interchange loops to have the
     # longer loop para.
     # WARNING: Only the outer loop
-    nn_dist_id = ray.put(config1.nndistances)
-    nn_displ_id = ray.put(config1.nndisplacements)
-    descr_id = ray.put(descriptors_array)
-
-    result_ids = []
     for l in range(nr_modi):
-        result_ids.append(linear_force_summands.remote(nn_dist_id, nn_displ_id, q[l], descr_id, l, n_ions, dim))
+        # build the scalar prefactor for each distance vector
+        # IDEA: rewrite the next few lines, s.t. it calculates the forces directly?
+        summands = np.zeros((n_ions, dim))
+        for k in range(n_ions):
+            # IDEA: do not cast to array
+            factor = grad_scalar(q[l], config1.nndistances[k])
+            summands[k] = np.sum(
+                factor[:, np.newaxis] * config1.nndisplacements[k],
+                axis=0
+            )
 
+        submat += (descriptors_array[:, l, np.newaxis] * summands.flatten()).T
 
-    sumds = np.array(ray.get(result_ids))
-    return -2 * sumds.sum(axis=0)
-
+    return -2 * submat
 
 class Kernel:
     def __init__(self, mode, *args):

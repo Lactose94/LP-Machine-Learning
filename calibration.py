@@ -67,18 +67,22 @@ def build_linear(u_conf: dict, configurations, C: np.array, q) -> (np.array, np.
     # initialize ray for multiprocessing
     ray.init()
     # build the linear system
-    descr = C.reshape(n_conf * n_ion, len(q))
     t_0 = time()
+    res_ids = []
+    descr = ray.put(C.reshape(n_conf * n_ion, len(q)))
     for alpha in range(n_conf):
         print(f'Building [E, F, T]: {alpha+1}/{n_conf}', end='\r')
         E[alpha] = configurations[alpha].energy
         F[alpha*n_ion*3: (alpha+1)*n_ion*3] = configurations[alpha].forces.flatten()
-        T[alpha*n_ion*3:(alpha+1)*n_ion*3] = kern.force_mat(q, configurations[alpha], descr)
+        res_ids.append(kern.force_mat.remote(q, configurations[alpha], descr))
+        #T[alpha*n_ion*3:(alpha+1)*n_ion*3] = kern.force_mat(q, configurations[alpha], descr)
+
+    T = np.array(ray.get(res_ids))
     print(f'Building [E, F, T]: finished after {time()-t_0:.3} s')
 
     t_0 = time()
     print('Building K:', end='\r')
-    K = kern.kernel(descr, descr)
+    K = kern.kernel(ray.get(descr), ray.get(descr))
     K = np.sum(
         K.reshape(n_conf, n_ion, n_conf * n_ion),
         axis=1
