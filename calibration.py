@@ -2,6 +2,7 @@ import json
 from time import time
 from math import pi
 import numpy as np
+import psutil
 import ray
 from outcar_parser import Parser
 from configuration import Configuration
@@ -65,20 +66,27 @@ def build_linear(u_conf: dict, configurations, C: np.array, q) -> (np.array, np.
     T = np.zeros((n_conf * n_ion * 3, n_conf * n_ion))
 
     # initialize ray for multiprocessing
-    ray.init()
+    mem = int(psutil.virtual_memory().available * 0.9)
+    ray.init(num_cpus=8, num_gpus=1, object_store_memory=mem)
     # build the linear system
     t_0 = time()
     res_ids = []
     descr = ray.put(C.reshape(n_conf * n_ion, len(q)))
+    print('Building linear system:')
     for alpha in range(n_conf):
-        print(f'Building [E, F, T]: {alpha+1}/{n_conf}', end='\r')
+        print(f'Initializing [E, F, T]: {alpha+1}/{n_conf}', end='\r')
         E[alpha] = configurations[alpha].energy
         F[alpha*n_ion*3: (alpha+1)*n_ion*3] = configurations[alpha].forces.flatten()
         res_ids.append(kern.force_mat.remote(q, configurations[alpha], descr))
         #T[alpha*n_ion*3:(alpha+1)*n_ion*3] = kern.force_mat(q, configurations[alpha], descr)
+    print(f'Initializing [E, F, T]: finished after {time()-t_0:.3}s')
 
+    t_1 = time()
+    print('Calculating T: ', end='\r')
     T = np.array(ray.get(res_ids))
-    print(f'Building [E, F, T]: finished after {time()-t_0:.3} s')
+    a, b, c = T.shape
+    T = T.reshape(a*b, c)
+    print(f'Calculating T: finisheds after {time()-t_1:.3}')
 
     t_0 = time()
     print('Building K:', end='\r')
@@ -88,6 +96,8 @@ def build_linear(u_conf: dict, configurations, C: np.array, q) -> (np.array, np.
         axis=1
     )
     print(f'Building K: finished after {time()-t_0:.3} s')
+    print(f'Initializing [E, F, T]: {alpha+1}/{n_conf}', end='\r')
+    ray.shutdown()
     return (E, F, K, T)
 
 
