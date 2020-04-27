@@ -57,9 +57,10 @@ def build_linear(u_conf: dict,configurations, C: np.array, q) -> (np.array, np.a
         print(f'Building [E, F, T]: {alpha+1}/{N_conf}', end='\r')
         E[alpha] = configurations[alpha].energy
         F[alpha*N_ion*3: (alpha+1)*N_ion*3] = configurations[alpha].forces.flatten()
-        T[alpha*N_ion*3:(alpha+1)*N_ion*3] = kern.force_mat(qs, configurations[alpha], descr)
+        T[alpha*N_ion*3:(alpha+1)*N_ion*3] = kern.force_mat(q, configurations[alpha], descr)
     print(f'Building [E, F, T]: finished after {time()-t0:.3} s')
 
+    t0 = time()
     print('Building K:', end='\r')
     K = kern.kernel(descr, descr)
     K = np.sum(
@@ -90,7 +91,7 @@ def main():
     (user_config['N_conf'], user_config['N_ion'], user_config['lattice_vectors'], configurations) = load_data(user_config)
 
     # All descriptors in compact super-matrix
-    C = np.zeros([user_config['N_ion'], user_config['nr_modi']])
+    C = np.zeros([user_config['N_conf'], user_config['N_ion'], user_config['nr_modi']])
     # compute the nn and configurations and fill them in C
     init_configurations(user_config, configurations, qs, C)
     
@@ -100,15 +101,15 @@ def main():
     t0 = time()
     # calculate the weights using ridge regression
     # IDEA: get quality of the fit with the sklearn function
-    print('Solving linear system: ', end='')
+    print('Solving linear system: ', end='\r')
     w_E = ridge_regression(K, E, user_config['lambda'])
     w_F = ridge_regression(T, F, user_config['lambda'])
-    print(f'finished after {time()-t0:.3} s')
+    print(f'Solving linear system: finished after {time()-t0:.3} s')
 
     
     # save calibration (file content will be overwritten if file already exists)
     np.savetxt('calibration_w.out', (w_E, w_F))
-    np.savetxt('calibration_C.out', np.reshape(C, (user_cofig['N_conf'], user_config['N_ion'] * user_config['nr_modi'])))
+    np.savetxt('calibration_C.out', np.reshape(C, (user_config['N_conf'], user_config['N_ion'] * user_config['nr_modi'])))
     # loading: C_cal = np.reshape(np.loadtxt('calibration.out'), (N_conf, N_ion, user_config['nr_modi']))
     
 if __name__ == '__main__':
