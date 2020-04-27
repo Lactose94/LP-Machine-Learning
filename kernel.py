@@ -14,7 +14,6 @@ def linear_kernel(descr_list1: np.array, descr_list2: np.array) -> np.array:
     return np.dot(descr_list1, descr_list2.T)
 
 
-# TODO: write decomposition into the mathematical documentation
 # TODO: check if something's up with the diagonal elements
 def gaussian_kernel(descr_list1: np.array, descr_list2: np.array, sigma: float) -> np.float:
 
@@ -53,10 +52,8 @@ def linear_force_submat(q: np.array, config1: configuration, descriptors_array: 
     # WARNING: Only the outer loop
     for l in range(nr_modi):
         # build the scalar prefactor for each distance vector
-        # IDEA: rewrite the next few lines, s.t. it calculates the forces directly?
         summands = np.zeros((n_ions, dim))
         for k in range(n_ions):
-            # IDEA: do not cast to array
             factor = grad_scalar(q[l], config1.nndistances[k])
             summands[k] = np.sum(
                 factor[:, np.newaxis] * config1.nndisplacements[k],
