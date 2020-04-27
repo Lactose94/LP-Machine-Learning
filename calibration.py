@@ -2,6 +2,7 @@ import json
 from time import time
 from math import pi
 import numpy as np
+import ray
 from outcar_parser import Parser
 from configuration import Configuration
 import kernel
@@ -54,6 +55,7 @@ def build_linear(u_conf: dict, configurations, C: np.array, q) -> (np.array, np.
     kern = kernel.Kernel(*u_conf['kernel'])
     n_conf = u_conf['N_conf']
     n_ion = u_conf['N_ion']
+
     # will be the super vectors
     E = np.zeros(n_conf)
     # this holds the matrix-elements in the shape [sum_j K(C^beta_j, C^alpha_i)]^beta_(alpha, i)
@@ -62,6 +64,8 @@ def build_linear(u_conf: dict, configurations, C: np.array, q) -> (np.array, np.
     F = np.zeros(n_conf * n_ion * 3)
     T = np.zeros((n_conf * n_ion * 3, n_conf * n_ion))
 
+    # initialize ray for multiprocessing
+    ray.init()
     # build the linear system
     descr = C.reshape(n_conf * n_ion, len(q))
     t_0 = time()
