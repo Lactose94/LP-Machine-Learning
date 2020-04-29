@@ -72,12 +72,13 @@ def build_linear(u_conf: dict, configurations, C: np.array, q) -> (np.array, np.
     t_0 = time()
     res_ids = []
     descr = ray.put(C.reshape(n_conf * n_ion, len(q)))
+    confs = ray.put(configurations)
     print('Building linear system:')
     for alpha in range(n_conf):
         print(f'\tInitializing [E, F, T]: {alpha+1}/{n_conf}', end='\r')
         E[alpha] = configurations[alpha].energy
         F[alpha*n_ion*3: (alpha+1)*n_ion*3] = configurations[alpha].forces.flatten()
-        res_ids.append(kern.force_mat.remote(q, configurations[alpha], descr))
+        res_ids.append(kern.force_mat.remote(q, confs, alpha, descr))
         #T[alpha*n_ion*3:(alpha+1)*n_ion*3] = kern.force_mat(q, configurations[alpha], descr)
     print(f'\tInitializing [E, F, T]: finished after {time()-t_0:.3}s')
 

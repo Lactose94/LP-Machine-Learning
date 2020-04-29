@@ -36,10 +36,10 @@ def grad_scalar(q: float, dr: np.array) -> np.array:
 
 @ ray.remote
 # builds part of the row for the force kernel matrix given a configuration and a set of descriptors
-def linear_force_submat(q: np.array, config1: configuration, descriptors_array: np.array) -> np.array:
+def linear_force_submat(q: np.array, config1: configuration, index: int, descriptors_array: np.array) -> np.array:
     nr_modi = len(q)
-    n_ions, modi_config = np.shape(config1.descriptors)
-    _, dim = np.shape(config1.positions)
+    n_ions, modi_config = np.shape(config1[index].descriptors)
+    _, dim = np.shape(config1[index].positions)
     nr_descriptors, modi_desc = np.shape(descriptors_array)
 
     if not nr_modi == modi_config == modi_desc:
@@ -47,8 +47,8 @@ def linear_force_submat(q: np.array, config1: configuration, descriptors_array: 
 
 
     nr_modi = len(q)
-    n_ions, modi_config = np.shape(config1.descriptors)
-    _, dim = np.shape(config1.positions)
+    n_ions, modi_config = np.shape(config1[index].descriptors)
+    _, dim = np.shape(config1[index].positions)
     nr_descriptors, modi_desc = np.shape(descriptors_array)
 
     if not nr_modi == modi_config == modi_desc:
@@ -65,9 +65,9 @@ def linear_force_submat(q: np.array, config1: configuration, descriptors_array: 
         summands = np.zeros((n_ions, dim))
         for k in range(n_ions):
             # IDEA: do not cast to array
-            factor = grad_scalar(q[l], config1.nndistances[k])
+            factor = grad_scalar(q[l], config1[index].nndistances[k])
             summands[k] = np.sum(
-                factor[:, np.newaxis] * config1.nndisplacements[k],
+                factor[:, np.newaxis] * config1[index].nndisplacements[k],
                 axis=0
             )
 
