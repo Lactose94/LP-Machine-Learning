@@ -14,10 +14,11 @@ def dist(r1, r2, a=1):
 
 class Configuration(object):
     
-    def __init__(self, positions, energy=None, forces=None, nndisplacements=None, nndistances=None, descriptors=None):
+    def __init__(self, positions, energy=None, forces=None, nnindices=None, nndisplacements=None, nndistances=None, descriptors=None):
         self.positions = positions
         self.energy = energy
         self.forces = forces
+        self.nnindices = nnindices
         self.nndisplacements = nndisplacements
         self.nndistances = nndistances
         self.descriptors = descriptors
@@ -26,6 +27,7 @@ class Configuration(object):
     # Dafür muss die float-Variable rcut in Angström übergeben werden.
     def init_nn(self, rcut, lattice):
         n = np.shape(self.positions)[0] # nr of atoms
+        self.nnindices = [[] for i in range(n)] # n lists of variable length inside a list -> later conversion to list of numpy.arrays
         self.nndisplacements = [[] for i in range(n)] # n lists of variable length inside a list -> later conversion to list of numpy.arrays
         self.nndistances = [[] for i in range(n)] # n lists of variable length inside a list -> later conversion to list of numpy.arrays
         
@@ -37,10 +39,13 @@ class Configuration(object):
                 rj_ri = dist(self.positions[i,:], self.positions[j,:], a)
                 dr = np.sqrt(rj_ri.dot(rj_ri))
                 if dr < rcut:
+                    self.nnindices[i].append(j) # j is NN of i
+                    self.nnindices[j].append(i) # i is NN of j
                     self.nndisplacements[i].append(rj_ri) # NN atom - central atom
                     self.nndisplacements[j].append(-rj_ri) # NN atom - central atom
                     self.nndistances[i].append(dr)
                     self.nndistances[j].append(dr)
+            self.nnindices[i] = np.array(self.nnindices[i]) # type conversion from list to numpy-array
             self.nndisplacements[i] = np.array(self.nndisplacements[i]) # type conversion from list to numpy-array
             self.nndistances[i] = np.array(self.nndistances[i]) # type conversion from list to numpy-array
             # IDEA: calculate the descriptors here
@@ -59,7 +64,11 @@ class Configuration(object):
             for i in range(0,m): # loop over central atoms
                 self.descriptors[i,:] = np.sum(np.sin(np.tensordot(q, self.nndistances[i], axes=0)), axis=1)
         return
-            
+        
+    def get_nndescriptor(self, j):
+        nn_descriptor_j = self.descriptors[self.nnindices[j] , :]
+        return nn_descriptor_j
+
 if __name__ == '__main__':
     
     rcut = 4
