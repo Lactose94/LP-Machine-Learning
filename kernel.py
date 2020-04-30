@@ -73,7 +73,6 @@ def gaussian_force_submat(q: np.array, config1: configuration, descriptors_array
     submat = np.zeros((n_ions, dim, nr_descriptors))
     
     for l in range(nr_modi):
-        summands = np.zeros((n_ions, dim))
         for k in range(n_ions):
             factor1 = grad_scalar(q[l], config1.nndistances[k])[:, np.newaxis] * config1.nndisplacements[k]
             
