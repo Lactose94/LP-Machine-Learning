@@ -55,15 +55,39 @@ def linear_force_submat(q: np.array, config1: configuration, descriptors_array: 
         summands = np.zeros((n_ions, dim))
         for k in range(n_ions):
             factor = grad_scalar(q[l], config1.nndistances[k])
-            summands[k] = np.sum(
-                factor[:, np.newaxis] * config1.nndisplacements[k],
-                axis=0
-            )
+            summands[k] = np.sum(factor[:, np.newaxis] * config1.nndisplacements[k],axis=0)
 
         submat += (descriptors_array[:, l, np.newaxis] * summands.flatten()).T
 
     return -2 * submat
 
+def gaussian_force_submat(q: np.array, config1: configuration, descriptors_array: np.array, sig: float) -> np.array:
+    nr_modi = len(q)
+    n_ions, modi_config = np.shape(config1.descriptors)
+    _, dim = np.shape(config1.positions)
+    nr_descriptors, modi_desc = np.shape(descriptors_array)
+    
+    if not nr_modi == modi_config == modi_desc:
+        raise ValueError('The nr of q\'s does not match')
+    
+    submat = np.zeros((n_ions, dim, nr_descriptors))
+    
+    for l in range(nr_modi):
+        summands = np.zeros((n_ions, dim))
+        for k in range(n_ions):
+            factor1 = grad_scalar(q[l], config1.nndistances[k])[:, np.newaxis] * config1.nndisplacements[k]
+            
+            factor3a = gaussian_kernel(config1.get_nndescriptor(k), descriptors_array, sig)
+            factor4a = descriptors_array[np.newaxis,:,l] - config1.get_nndescriptor(k)[:,l,np.newaxis]
+            factor3b = gaussian_kernel(config1.descriptors[k,:], descriptors_array, sig)
+            factor4b = descriptors_array[np.newaxis,:,l] - config1.descriptors[k,l,np.newaxis]
+            factor5 = factor3a*factor4a + factor3b*factor4b
+            
+            factor_all = np.sum(factor1[:, np.newaxis, :] * factor5[:, :, np.newaxis], axis=0)
+            submat[k,:,:] += factor_all.T
+            
+    submat = np.reshape(submat, (n_ions * dim, nr_descriptors))
+    return -1/sig**2 * submat
 
 class Kernel:
     def __init__(self, mode, *args):
@@ -74,8 +98,7 @@ class Kernel:
             if not args:
                 raise ValueError('For the Gaussian Kernel a sigma has to be supplied')
             self.kernel = lambda x, y: gaussian_kernel(x, y, args[0])
-            # TODO: Put in correct value for the gaussian force!
-            self.force_mat = lambda x: x
+            self.force_mat = lambda x, y, z: gaussian_force_submat(x, y, z, args[0])
         else:
             raise ValueError(f'kernel {mode} is not supported')
 
