@@ -1,9 +1,9 @@
 {
     "file_in": "OUTCAR.21",
     "file_out": "out.txt",
-    "stepsize": 10,
+    "stepsize": 100,
     "cutoff": 4,
     "nr_modi": 8,
     "lambda": 1e-1,
-    "kernel": ["linear", []]
+    "kernel": ["gaussian", 1]
 }
