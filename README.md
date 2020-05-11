@@ -14,25 +14,25 @@ Das Package enthält im Wesentlichen eine Klasse:
 ### Die Parser Klasse:
 Diese kann ausschließlich mit einem outcar-file initialisiert werden. Tatsächlich wird eine exception geworfen, falls der Dateiname nicht auf "outcar.digit" endet. 
 #### Variablen:
-- `filepath` enthält den Pfad zum outcar-file als String.
-- `outcar_content` enthält den kompletten Inhalt des Files als String.
+- **`filepath`** enthält den Pfad zum outcar-file als String.
+- **`outcar_content`** enthält den kompletten Inhalt des Files als String.
 
 #### Methoden:
-- **find_ion_nr**:  
+- **`find_ion_nr(self) -> int`**:  
   Durchsucht mithilfe von Regex den Inhalt nach der Zeile  
   
     > ions per type = ...  
     
   extrahiert daraus die Ionenzahl und gibt diese als Integer zurück.   
   Wirft einen `RuntimeError` falls keine solche Zeile gefunden werden kann.
-- **find_lattice_vectors**:  
+- **`find_lattice_vectors(self) -> np.array`**:  
   Durchsucht mithilfe von Regex den Inhalt nach der Zeile:
     
     > direct lattice vectors ...
    
    und gibt die darauf folgenden lattice vectors als numpy array zurück.  
    Wirft einen `RuntimeError`falls keine solche Zeile gefunden werden kann.
- - **build_configurations**:  
+ - **`build_configurations(self, step_size: int) -> (float, np.array, np.array)`**:  
   Dieser **Iterator** dient dazu die Werte der einzelnen Konfigurationen auszulesen.  
   Nimmt als input die Schrittweite, wie viele Konfigurationen übersprungen werden sollen, gibt jedoch immer mindestens eine Konfiguration zurück.  
   Spaltet zuerst den Inhalt an der Zeile:
@@ -48,10 +48,7 @@ Diese kann ausschließlich mit einem outcar-file initialisiert werden. Tatsächl
   Anschließend wird der Text der Konfiguratition an den Linien bestend aus einem Leerzeichen und 83 mal "-" aufgespalten. Die erste davon enthält die Positions- und Kraftvektoren, welche Zeilenweise in floats und dann in numpy arrays umgewandelt und anschließend als Positionen und Kräfte getrennt in arrays gespeichert werden.  
   Sollte dabei die shape der Kräfte nicht mit der der Positionen übereinstimmen, wird eine `RuntimeError` geworfen.  
   Schließlich werden diese drei Werte als Tupel zurück gegeben in der Form *(E, Positionen, Kräfte)*.  
-  
-  ### Tests:
-  Führt man das File einzeln aus, werden nacheinander kleinere Assertions überprüft und anschließend über alle Konfigurationen des Beispielfiles iteriert und auf dem Bildschirm ausgegeben. Sollte in Zukunft noch durch ein vernünftiges Testframework ersetzt werden.
-  
+
 ---
 ## Configurations
 Dieses Package dient dazu die einzelnen Konfigurationen der Ionen zu speichern, und zu verarbeiten. Es beinhaltet die Configurations-Klasse, dessen Instanzen je eine Ionen-Konfiguration und ihre Eigenschaften darstellen.
@@ -98,13 +95,12 @@ Mit dummy-Konfigurationen werden die einzelnen Funktionen der Klasse getestet.
 ## Calibration
 Dieses package bündelt die vorherigen packages und nutzt diese um das eigentliche Machine Learning durchzuführen.  
 Der Benutzer legt dabei die Parameter des Machine Learnings durch einträge in der Datei `user_config.json` fest. Im folgenden werden die Parameter erläutert:
-- `file_in`: Hier wird der Pfad zum *outcar*-file, welches die Trainingsdaten enthält, eingetragen.
-- `file_out`: Hier kann der Benutzer angeben, in welcher Datei die Ergebnisse des Learnings eingetragen werden sollen. Wie genau diese aussehen, muss noch spezifiert werden.
-- `stepsize`: Hier gibt der Benutzer an, wie viele Konfigurationen beim Einlesen übersprungen werden sollen. Selbst wenn die Anzahl verfügbarer Konfigurationen überschritten wird, wird immer mindestens eine eingelesen.
-- `cutoff`: Hier gibt der Benutzer den Radius der Cutoff-Sphere in Angstroem an.
-- `nr_modi`: Gibt an, welche Länge die Descriptor-Vektoren haben sollen.
-- `lambda`: Parameter, welcher für die Ridge-Regression genutzt werden soll.
-- `Kernel`: Welcher Kernel für die Entwicklung der lokalen Energie genutzt werden sollen und eventuell zusätzliche Parameter, z.B. das Sigma für den gaussian Kernel  . Bisher werden nur `linear` und `gaussian` unterstützt.
+- **`file_in`**: Hier wird der Pfad zum *outcar*-file, welches die Trainingsdaten enthält, eingetragen.
+- **`stepsize`**: Hier gibt der Benutzer an, wie viele Konfigurationen beim Einlesen übersprungen werden sollen. Selbst wenn die Anzahl verfügbarer Konfigurationen überschritten wird, wird immer mindestens eine eingelesen.
+- **`cutoff`**: Hier gibt der Benutzer den Radius der Cutoff-Sphere in Angstroem an.
+- **`nr_modi`**: Gibt an, welche Länge die Descriptor-Vektoren haben sollen.
+- **`lambda`**: Parameter, welcher für die Ridge-Regression genutzt werden soll.
+- **`Kernel`**: Welcher Kernel für die Entwicklung der lokalen Energie genutzt werden sollen und eventuell zusätzliche Parameter, z.B. das Sigma für den gaussian Kernel  . Bisher werden nur `linear` und `gaussian` unterstützt.
 
 ---
 ## Kernel
