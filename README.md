@@ -110,16 +110,13 @@ Der Benutzer legt dabei die Parameter des Machine Learnings durch einträge in d
 ## Kernel
 Dieses Package versucht die wesentlichen Funktionalitäten des Kernels zu fokussieren.
 ### Funktionen:
-- `linear_kernel(descr_list1: np.array, descr_list2: np.array) -> np.array:` Given two arrays of descriptors, this function calculates the Kernel matrix wrt the linear kernel.
-- `gaussian_kernel(descr_list1: np.array, descr_list2: np.array, sigma: float) -> np.float:` Given two arrays of descriptors, this function calculates the Kernel matrix wrt the linear gaussian kernel.
-- `grad_scalar(q: float, dr: np.array) -> np.array:` The gradient of a descriptor is the sum over a scalar prefactor times a difference-vector. This function builds the scalar prefactors from an array of distances.
-- `def linear_force_subrow(q: np.array, config1: configuration, descriptors_array: np.array) -> np.array:` Builds the force matrix elements for config1 given a set of descriptors, in the *linear* case. For example, if we have two configurations, then the function will build the matrix element T^(1,k=1,...,Nions, l=1...,3)_(2,i=1,...,Nions).
-If given a complete set of descriptors i.e (Nconf * Nions, n_q) it builds the rows of the coefficient matrix for the given configuration.
+- **`linear_kernel(descr_list1: np.array, descr_list2: np.array) -> np.array:`** Given two arrays of descriptors, this function calculates the Kernel matrix of the linear kernel as described in equation (11) of the mathematical documentation.
+- **`gaussian_kernel(descr_list1: np.array, descr_list2: np.array, sigma: float) -> np.array:`** Given two arrays of descriptors, this function calculates the Kernel matrix of the gaussian kernel as described in equation (12) of the mathematical documentation. 
+- **`grad_scalar(q: float, dr: np.array) -> np.array:`** The gradient of a descriptor is the sum over a scalar prefactor times a difference-vector. This function builds the scalar prefactors from an array of distances. Compare to equation (13).
+- **`linear_force_submat(q: np.array, config1: configuration, descriptors_array: np.array) -> np.array:`** Builds one row for the linear matrix element, needed for fitting teh forces. This implements the equation (15) for one fixed configuration beta.
 
 ### Die Kernel-Klasse
-Diese dient als wrapper um die übrigen Funktionalität dem User gebündelt zur Verfügung zu stellen
+This class is a wrapper to consistently use the choosen Kernel type for energies and forces.
 #### Variablen:
-- `kernel`: Enthält den gewünschten Kernel als Funktion.
-#### Methods
-- `energy_matrix_element`: supply two sets of descriptors, from which the corresponding matrixelements are built. For example, if descriptors of config1 and config2 are given, the output will be sum_i K^(1,i=1,..,Nions)_(2,j=1,...,Nions). If we supply one configuration and a full set of descriptors, then we get the corresponding row, which multiplied by the weights should give the energy.
-- `force_submat`: takes as input two configurations and just applies the correct submatrix (linear or gaussian) to them.
+- **`kernel`**: Holds the choosen kernel type as function.
+- **`force_mat`**: Holds the derivative/force matrix function of the corresponding choosen kernel.
