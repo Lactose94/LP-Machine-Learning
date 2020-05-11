@@ -108,15 +108,15 @@ Der Benutzer legt dabei die Parameter des Machine Learnings durch einträge in d
 
 ---
 ## Kernel
-Dieses Package versucht die wesentlichen Funktionalitäten des Kernels zu fokussieren.
-### Funktionen:
+This package focuses on bundeling all the kernel related functions and give the user consistent acess.
+### functions:
 - **`linear_kernel(descr_list1: np.array, descr_list2: np.array) -> np.array:`** Given two arrays of descriptors, this function calculates the Kernel matrix of the linear kernel as described in equation (11) of the mathematical documentation.
 - **`gaussian_kernel(descr_list1: np.array, descr_list2: np.array, sigma: float) -> np.array:`** Given two arrays of descriptors, this function calculates the Kernel matrix of the gaussian kernel as described in equation (12) of the mathematical documentation. 
 - **`grad_scalar(q: float, dr: np.array) -> np.array:`** The gradient of a descriptor is the sum over a scalar prefactor times a difference-vector. This function builds the scalar prefactors from an array of distances. Compare to equation (13).
 - **`linear_force_submat(q: np.array, config1: configuration, descriptors_array: np.array) -> np.array:`** Builds one row for the linear matrix element, needed for fitting teh forces. This implements the equation (15) for one fixed configuration beta.
 
-### Die Kernel-Klasse
+### The Kernel class
 This class is a wrapper to consistently use the choosen Kernel type for energies and forces.
-#### Variablen:
+#### variables:
 - **`kernel`**: Holds the choosen kernel type as function.
 - **`force_mat`**: Holds the derivative/force matrix function of the corresponding choosen kernel.
