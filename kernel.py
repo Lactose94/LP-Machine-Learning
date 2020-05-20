@@ -39,8 +39,6 @@ def derivatives(q: np.array, displ: np.array, dist: np.array) -> np:
     rq = dist.reshape(nc, ni, ni, 1) * q
     qcosrq = q * np.cos(rq)
     R_over_r = displ / dist.reshape(nc, ni, ni, 1)
-    # filter out where we divide by 0 and replace by 0
-    R_over_r[np.isnan(R_over_r)] = 0
     D = qcosrq.reshape(nc, ni, ni, 1, nq) *  R_over_r.reshape(nc, ni, ni, d, 1)
 
     return D
