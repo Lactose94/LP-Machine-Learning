@@ -30,15 +30,20 @@ def gaussian_kernel(descr_list1: np.array, descr_list2: np.array, sigma: float) 
     return np.exp(dr / (2 * sigma**2))
 
 
-# returns the scalar prefactor for the matrix element of the forces
-def grad_scalar(q: float, dr: np.array) -> np.array:
-    return q * np.cos(q * dr) / dr
-
-def derivatives(q, displ, dist) -> np:
+def derivatives(q: np.array, displ: np.array, dist: np.array) -> np:
+    '''
+    Calculate the derivatives matrix of the descriptors
+    '''
     nq = len(q)
     nc, ni, _, d = displ.shape
+    rq = dist.reshape(nc, ni, ni, 1) * q
+    qcosrq = q * np.cos(rq)
+    R_over_r = displ / dist.reshape(nc, ni, ni, 1)
+    # filter out where we divide by 0 and replace by 0
+    R_over_r[np.isnan(R_over_r)] = 0
+    D = qcosrq.reshape(nc, ni, ni, 1, nq) *  R_over_r.reshape(nc, ni, ni, d, 1)
 
-    return np.ones((nc, ni, ni, 3, nq))
+    return D
 
 
 # builds part of the row for the force kernel matrix given a configuration and a set of descriptors
