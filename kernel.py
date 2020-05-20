@@ -34,6 +34,12 @@ def gaussian_kernel(descr_list1: np.array, descr_list2: np.array, sigma: float) 
 def grad_scalar(q: float, dr: np.array) -> np.array:
     return q * np.cos(q * dr) / dr
 
+def derivatives(q, displ, dist) -> np:
+    nq = len(q)
+    nc, ni, _, d = displ.shape
+
+    return np.ones((nc, ni, ni, 3, nq))
+
 
 # builds part of the row for the force kernel matrix given a configuration and a set of descriptors
 def linear_force_submat(q: np.array, config1: configuration, descriptors_array: np.array) -> np.array:
