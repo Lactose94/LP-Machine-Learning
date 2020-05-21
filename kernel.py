@@ -27,19 +27,19 @@ def gaussian_kernel(descr_list1: np.array, descr_list2: np.array, sigma: float) 
     coeffs = linear_kernel(descr_list1, descr_list2)
 
     dr = abs1 - 2 * coeffs + abs2
-    return np.exp(dr / (2 * sigma**2))
+    return np.exp(-dr / (2 * sigma**2))
 
 
 def derivatives(q: np.array, displ: np.array, dist: np.array) -> np:
     '''
-    Calculate the derivatives matrix of the descriptors
+    Calculate the derivatives matrix of the descriptors. The displacements
+    have to be normalized.
     '''
     nq = len(q)
     nc, ni, _, d = displ.shape
     rq = dist.reshape(nc, ni, ni, 1) * q
     qcosrq = q * np.cos(rq)
-    R_over_r = displ / dist.reshape(nc, ni, ni, 1)
-    D = qcosrq.reshape(nc, ni, ni, 1, nq) *  R_over_r.reshape(nc, ni, ni, d, 1)
+    D = qcosrq.reshape(nc, ni, ni, 1, nq) *  displ.reshape(nc, ni, ni, d, 1)
 
     return D
 
