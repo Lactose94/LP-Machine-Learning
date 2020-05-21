@@ -14,8 +14,8 @@ def linear_kernel(descr_list1: np.array, descr_list2: np.array) -> np.array:
     return np.matmul(descr_list1, descr_list2.T) # it says in the documentation that matmul is preferred over dot
 
 
-def gaussian_kernel(descr_diff: np.array, sigma: float) -> np.array:
-    
+def gaussian_kernel(descr_list1: np.array, descr_list2: np.array, sigma: float) -> np.array:
+    descr_diff = np.transpose(np.diagonal(np.subtract.outer(descr_list2, descr_list1), axis1=3, axis2=1), axes=(1,0,2))
     # Kernel-Matrix: dim = [ Nj*Nb , Ni*Na ]
     kernel = np.sum(descr_diff**2, axis=2)
     kernel = np.exp(- kernel / (2 * sigma**2))
@@ -98,29 +98,11 @@ class Kernel:
         elif mode == 'gaussian':
             if not args:
                 raise ValueError('For the Gaussian Kernel a sigma has to be supplied')
-            self.descr_diff = np.zeros((2,2,2)) # brauch ich das für die force_mat später?
-            self.kernel = lambda x, y: gaussian_kernel(self.descriptor_difference(x, y), args[0])
+            self.kernel = lambda x, y: gaussian_kernel(x, y, args[0])
             self.force_mat = lambda x, y, z: gaussian_force_mat(x, y, z, args[0]) # Generell neu schreiben, self.descr_diff an force_submat übergeben
         else:
             raise ValueError(f'kernel {mode} is not supported')
     
-    # descr_list1 ist die aktuelle Konfiguration, descr_list2 die Referenz-Konfiguration!
-    def descriptor_difference(self, descr_list1: np.array, descr_list2: np.array) -> np.array:
-    
-        ##### Methode 1: Keine Loops aber unnötig berechnete Matrix-Einträge #####
-        # Descriptor-Differenzmatrix: dim = [ Nj*Nb , Ni*Na , q ]
-        self.descr_diff = np.transpose(np.diagonal(np.subtract.outer(descr_list2, descr_list1), axis1=3, axis2=1), axes=(1,0,2))
-    
-        """
-        ##### Methode 2: Eine Loop für q, dafür keine unnötig berechneten Matrix-Einträge #####
-        (nj, nq) = np.shape(descr_list1)
-        ni = np.shape(descr_list2)[0]
-        # Descriptor-Differenzmatrix: dim = [ Nj*Nb , Ni*Na , q ]
-        descr_diff = np.zeros((nj,ni,nq))
-        for q in range(nq):
-            descr_diff[:,:,q] = np.transpose(np.subtract.outer(descr_list2[:,q], descr_list1[:,q]))
-        """
-        return self.descr_diff
 
     # builds a matrix-element for a given configuration
     # and !!one!! given descriptor vector (i.e. for !!one!! atom)
