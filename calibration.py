@@ -74,6 +74,7 @@ def build_linear(u_conf: dict, configurations, C: np.array, q) -> (np.array, np.
 
     t_0 = time()
     print('Building K:', end='\r')
+    # das erste Argument ist die aktuelle Konfiguration, das zweite die Referenz-Konfiguration
     K = kern.kernel(descr, descr)
     K = np.sum(
         K.reshape(n_conf, n_ion, n_conf * n_ion),
@@ -98,7 +99,7 @@ def main():
     with open('user_config.json', 'r') as u_conf:
         user_config = json.load(u_conf)
 
-    # make a lsit of the allowed qs
+    # make a list of the allowed qs
     qs = np.arange(1, user_config['nr_modi']+1) * pi / user_config['cutoff']
 
     # read in data and save parameters for calibration comparison
@@ -115,7 +116,7 @@ def main():
     t_0 = time()
     # calculate the weights using ridge regression
     # IDEA: get quality of the fit with the sklearn function
-    print('Solving linear system: ', end='\r')
+    print('Solving linear system ... ', end='\r')
     w_E = ridge_regression(K, E, user_config['lambda'])
     w_F = ridge_regression(T, F, user_config['lambda'])
     print(f'Solving linear system: finished after {time()-t_0:.3} s')
