@@ -14,65 +14,53 @@ def dist(r1, r2, a=1):
 
 class Configuration(object):
     
-    def __init__(self, positions, energy=None, forces=None, nnindices=None, nndisplacements=None, nndistances=None, descriptors=None):
+    def __init__(self, positions, energy=None, forces=None, nndisplace_norm=None, nndistances=None, descriptors=None):
         self.positions = positions
         self.energy = energy
         self.forces = forces
-        self.nnindices = nnindices
-        self.nndisplacements = nndisplacements
-        self.nndistances = nndistances
+        self.nndisplace_norm = nndisplace_norm # distances (vector) NORMALIZED (!), with 0 if not NN or self
+        self.nndistances = nndistances # distances (scalar) with 0 if not NN or self
         self.descriptors = descriptors
         
     # Diese Funktion erstellt die nearest-neighbour-tables für die Positionen und die Abstände.
     # Dafür muss die float-Variable rcut in Angström übergeben werden.
     def init_nn(self, rcut, lattice):
-        n = np.shape(self.positions)[0] # nr of atoms
-        self.nnindices = [[] for i in range(n)] # n lists of variable length inside a list -> later conversion to list of numpy.arrays
-        self.nndisplacements = [[] for i in range(n)] # n lists of variable length inside a list -> later conversion to list of numpy.arrays
-        self.nndistances = [[] for i in range(n)] # n lists of variable length inside a list -> later conversion to list of numpy.arrays
+        n, dim = np.shape(self.positions) # nr of atoms, nr of dimensions
+        # n x n x dim numpy.array of normalized NN-displacement table
+        self.nndisplace_norm = np.zeros((n, n, dim)) # 0 if self atom or not NN
+        # n x n numpy.array of NN-distances table
+        self.nndistances = np.zeros((n, n)) # 0 if self atom or not NN
         
         # get a vector of all lattice constants (primitive orthorhombic or cubic cell)
         a = lattice.diagonal()
             
+        # TODO: Diese Loops kann man eventuell auch wegrationalisieren!
         for i in range(n): # loop over central atoms
             for j in range(i+1,n): # loop over possible nearest neighbours
                 rj_ri = dist(self.positions[i,:], self.positions[j,:], a)
                 dr = np.sqrt(rj_ri.dot(rj_ri))
                 if dr < rcut:
-                    self.nnindices[i].append(j) # j is NN of i
-                    self.nnindices[j].append(i) # i is NN of j
-                    self.nndisplacements[i].append(rj_ri) # NN atom - central atom
-                    self.nndisplacements[j].append(-rj_ri) # NN atom - central atom
-                    self.nndistances[i].append(dr)
-                    self.nndistances[j].append(dr)
-            self.nnindices[i] = np.array(self.nnindices[i]) # type conversion from list to numpy-array
-            self.nndisplacements[i] = np.array(self.nndisplacements[i]) # type conversion from list to numpy-array
-            self.nndistances[i] = np.array(self.nndistances[i]) # type conversion from list to numpy-array
-            # IDEA: calculate the descriptors here
-
+                    self.nndisplace_norm[i,j,:] = rj_ri / dr # NN atom - central atom
+                    self.nndisplace_norm[j,i,:] = - rj_ri / dr # NN atom - central atom
+                    self.nndistances[i,j] = dr
+                    self.nndistances[j,i] = dr
+    
     # Diese Funktion erstellt die descriptor coefficients der configuration.
     # Dafür muss ein float-Vektor q übergeben werden.
     # Dass dieser mit rcut zusammenpasst wird vorausgesetzt und nicht weiter überprüft.
     def init_descriptor(self, q):
-        if self.nndistances is None or self.nndisplacements is None:
+        if self.nndistances is None:
             print("Execute Configuration.init_nn(rcut,lattice) before calculating descriptor coefficients!")
             return
         else:
-            m = np.shape(self.positions)[0]
-            n = np.size(q)
-            self.descriptors = np.zeros((m, n))
-            for i in range(0,m): # loop over central atoms
-                self.descriptors[i,:] = np.sum(np.sin(np.tensordot(q, self.nndistances[i], axes=0)), axis=1)
+            # n x len(q) numpy.array of Descriptor coefficients
+            self.descriptors = np.sum(np.sin(np.multiply.outer(self.nndistances, q)), axis=1)
         return
-        
-    def get_nndescriptor(self, j):
-        nn_descriptor_j = self.descriptors[self.nnindices[j] , :]
-        return nn_descriptor_j
-
+    
 if __name__ == '__main__':
     
     rcut = 4
-    q = [np.pi/rcut,2*np.pi/rcut,3*np.pi/rcut]
+    q = np.array([np.pi/rcut,2*np.pi/rcut,3*np.pi/rcut])
     lattice = np.array([[10.0 ,  0.0],
                         [0.0 , 10.0]])
     positions = np.array([[1.0 , 1.0], # hat 3 NN
@@ -85,7 +73,7 @@ if __name__ == '__main__':
     
     # test init_nn
     config1.init_nn(rcut, lattice)
-    print(config1.nndisplacements)
+    print(config1.nndisplace_norm)
     print(config1.nndistances)
     print(type(config1.nndistances[0]))
     
