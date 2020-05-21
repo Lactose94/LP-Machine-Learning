@@ -4,6 +4,6 @@
     "stepsize": 100,
     "cutoff": 4,
     "nr_modi": 8,
-    "lambda": 1e-1,
+    "lambda": 5e-1,
     "kernel": ["gaussian", 1]
 }
