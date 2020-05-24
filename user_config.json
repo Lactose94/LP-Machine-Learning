@@ -3,7 +3,7 @@
     "file_out": "out.txt",
     "stepsize": 100,
     "cutoff": 4,
-    "nr_modi": 8,
-    "lambda": 5e-1,
-    "kernel": ["gaussian", 1]
+    "nr_modi": 10,
+    "lambda": 1e-3,
+    "kernel": ["gaussian", 10]
 }
