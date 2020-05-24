@@ -54,34 +54,40 @@ def build_linear(u_conf: dict, configurations, C: np.array, q) -> (np.array, np.
     kern = kernel.Kernel(*u_conf['kernel'])
     n_conf = u_conf['N_conf']
     n_ion = u_conf['N_ion']
+    nc_ni = n_conf*n_ion
     # will be the super vectors
     E = np.zeros(n_conf)
     # this holds the matrix-elements in the shape [sum_j K(C^beta_j, C^alpha_i)]^beta_(alpha, i)
-    K = np.zeros((n_conf, n_conf * n_ion))
+    K = np.zeros((n_conf, nc_ni)) # not really necessary to initialize, as the matrix is built in one piece
     # Holds forces flattened
     F = np.zeros(n_conf * n_ion * 3)
-    T = np.zeros((n_conf * n_ion * 3, n_conf * n_ion))
+    T = np.zeros((n_conf * n_ion * 3, nc_ni))
 
     # build the linear system
     descr = C.reshape(n_conf * n_ion, len(q))
+    
+    t_0 = time()
+    print('Building K:', end='\r')
+    # das erste Argument ist die aktuelle Konfiguration, das zweite die Referenz-Konfiguration
+    K = kern.kernel_mat(descr, descr)
+    K = np.sum(
+        K.reshape(n_conf, n_ion, nc_ni),
+        axis=1
+    )
+    print(f'Building K: finished after {time()-t_0:.3} s')
+    
     t_0 = time()
     for alpha in range(n_conf):
         print(f'Building [E, F, T]: {alpha+1}/{n_conf}', end='\r')
         E[alpha] = configurations[alpha].energy
         F[alpha*n_ion*3: (alpha+1)*n_ion*3] = configurations[alpha].forces.flatten()
-        T[alpha*n_ion*3:(alpha+1)*n_ion*3] = kern.force_mat(q, configurations[alpha], descr)
+        T[alpha*n_ion*3:(alpha+1)*n_ion*3] = kern.force_submat(q, configurations[alpha], descr)
     print(f'Building [E, F, T]: finished after {time()-t_0:.3} s')
-
-    t_0 = time()
-    print('Building K:', end='\r')
-    # das erste Argument ist die aktuelle Konfiguration, das zweite die Referenz-Konfiguration
-    K = kern.kernel(descr, descr)
-    K = np.sum(
-        K.reshape(n_conf, n_ion, n_conf * n_ion),
-        axis=1
-    )
-    print(f'Building K: finished after {time()-t_0:.3} s')
-    return (E, F, K, T)
+    
+    E_ave = np.mean(E)
+    E = E - E_ave
+    
+    return (E, F, K, T, E_ave)
 
 
 def ridge_regression(K, E, lamb):
@@ -89,7 +95,6 @@ def ridge_regression(K, E, lamb):
     y = np.matmul(np.transpose(K), E)
     # (X+lamb*I) * w - y = 0
     N = np.shape(K)[1]
-    # IDEA: sklearn ridge-regression has several solving algorithms, maybe faster.
     w = np.linalg.solve(X + lamb * np.eye(N), y)  # faster than: w = np.matmul(np.linalg.inv(X + lamb * np.eye(N)) , y)
     return w
 
@@ -111,19 +116,19 @@ def main():
     init_configurations(user_config, configurations, qs, C)
 
     # build the linear system
-    (E, F, K, T) = build_linear(user_config, configurations, C, qs)
+    (E, F, K, T, E_ave) = build_linear(user_config, configurations, C, qs)
 
     t_0 = time()
     # calculate the weights using ridge regression
     # IDEA: get quality of the fit with the sklearn function
     print('Solving linear system ... ', end='\r')
-    w_E = ridge_regression(K, E, user_config['lambda'])
-    w_F = ridge_regression(T, F, user_config['lambda'])
+    w = ridge_regression(np.append(K,T, axis=0), np.append(E,F, axis=0), user_config['lambda'])
     print(f'Solving linear system: finished after {time()-t_0:.3} s')
 
     # save calibration (file content will be overwritten if file already exists)
-    np.savetxt('calibration_w.out', (w_E, w_F))
-    np.savetxt('calibration_C.out', np.reshape(C, (user_config['N_conf'], user_config['N_ion'] * user_config['nr_modi'])))
+    np.savetxt('calibration_w.out', w)
+    np.savetxt('calibration_C.out', np.reshape(C, (user_config['N_conf'] * user_config['N_ion'], user_config['nr_modi'])))
+    np.savetxt('calibration_E.out', [E_ave, E_ave])
     # loading: C_cal = np.reshape(np.loadtxt('calibration.out'), (N_conf, N_ion, user_config['nr_modi']))
 
 
