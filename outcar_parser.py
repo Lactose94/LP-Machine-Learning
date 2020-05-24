@@ -102,4 +102,7 @@ if __name__ == '__main__':
     i = 1
     for config in parser.build_configurations(1):
         print(config[0], i)
+        if i == 1:
+            print(config[1])
+            print(config[2])
         i += 1
