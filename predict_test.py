@@ -7,13 +7,13 @@ from configuration import Configuration
 import kernel
 
 
-def load_data(u_conf: dict) ->  (int, int, np.array, list):
+def load_data(u_conf: dict, stepsize=0) ->  (int, int, np.array, list):
     '''
     Loads the data from the file specified in u_conf and returns the parameters of the
     simulation as (N_conf, N_ion, lattice vectors, list of configurations)
     '''
-    
-    stepsize = 1000
+    if stepsize == 0:
+        stepsize = int(input("Stepsize for prediction? (integer): -> "))
     
     # load parser and save nr of ions and lattice vectors
     parser = Parser(u_conf['file_in'])
@@ -96,7 +96,24 @@ def ridge_prediction(K, w):
     return E
 
 
-def main():
+def print_results(E, E_cal, E_msd, F, F_cal, F_msd):
+    print("calculated Energies have a variance / std-deviation of:")
+    print('{:.5f}'.format(E_msd), "/", '{:.5f}'.format(np.sqrt(E_msd)))
+    print("calculated Forces have a variance / std-deviation of:")
+    print('{:.5f}'.format(F_msd), "/", '{:.5f}'.format(np.sqrt(F_msd)))
+    show = input("Show energies and forces? y:yes, n:no -> ")
+    if show == "y":
+        print("original Energies:")
+        print(E)
+        print("calculated Energies:")
+        print(E_cal)
+        print("original Forces:")
+        print(F)
+        print("calculated Forces:")
+        print(F_cal)
+
+
+def main(doprint = False):
     # load the simulation parameters
     with open('user_config.json', 'r') as u_conf:
         user_config = json.load(u_conf)
@@ -131,22 +148,18 @@ def main():
     F_msd = np.mean((F - F_cal)**2)
     
     # show results in compact way
-    print("calculated Energies have a variance / std-deviation of:")
-    print('{:.5f}'.format(E_msd), "/", '{:.5f}'.format(np.sqrt(E_msd)))
-#    print("Positions:")
-#    print([conf.positions for conf in configurations])
-    print("calculated Forces have a variance / std-deviation of:")
-    print('{:.5f}'.format(F_msd), "/", '{:.5f}'.format(np.sqrt(F_msd)))
-    show = input("Show energies and forces? y:yes, n:no -> ")
-    if show == "y":
-        print("original Energies:")
-        print(E)
-        print("calculated Energies:")
-        print(E_cal)
-        print("original Forces:")
-        print(F.reshape((user_config['N_conf'], user_config['N_ion'], 3)))
-        print("calculated Forces:")
-        print(F_cal.reshape((user_config['N_conf'], user_config['N_ion'], 3)))
+    if doprint:
+        print_results(
+            E, 
+            E_cal, 
+            E_msd, 
+            F.reshape((user_config['N_conf'], user_config['N_ion'], 3)), 
+            F_cal.reshape((user_config['N_conf'], user_config['N_ion'], 3)), 
+            F_msd
+    )
+    
+    return E_msd, F_msd
     
 if __name__ == '__main__':
-    main()
+    main(True) # printing results = True
+    
