@@ -37,9 +37,9 @@ def linear_force_submat(q: np.array, config1: configuration, descriptors_array: 
     nq = len(q)
     nj, modi_config = np.shape(config1.descriptors)
     _, dim = np.shape(config1.positions)
-    nani, nq = np.shape(descriptors_array)
+    nani, modi_desc = np.shape(descriptors_array)
 
-    if not nq == modi_config == nq:
+    if not nq == modi_config == modi_desc:
         raise ValueError('The nr of q\'s does not match')
 
     dist = config1.nndistances
