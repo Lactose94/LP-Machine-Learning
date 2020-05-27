@@ -5,5 +5,5 @@
     "cutoff": 4,
     "nr_modi": 10,
     "lambda": 1e-3,
-    "kernel": ["gaussian", 10]
+    "kernel": ["linear", 10]
 }
