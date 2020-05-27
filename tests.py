@@ -125,7 +125,7 @@ class TestKernel(unittest.TestCase):
         one = np.ones(10)
         ten_el = kern.energy_matrix_elements(descr1, one)
         self.assertEqual(ten_el, 10)
- 
+
         five = 5 * one
         fifty_el = kern.energy_matrix_elements(descr1, five)
         self.assertEqual(fifty_el, 50)
@@ -151,16 +151,16 @@ class TestKernel(unittest.TestCase):
         kern = kernel.Kernel('linear')
         expected_val = np.eye(10)
 
-        lin_eye = kern.kernel(np.eye(10), np.eye(10))
+        lin_eye = kern.kernel_mat(np.eye(10), np.eye(10))
         self.assertTrue(np.array_equal(lin_eye, expected_val))
 
     # test the values of the gaussian energy matrix for a simple example
     def test_gaussian_energy_matrix_values(self):
         kern = kernel.Kernel('gaussian', 1)
-        expected_val = np.ones((10, 10)) * exp(1)
+        expected_val = np.ones((10, 10)) * exp(-1)
         np.fill_diagonal(expected_val, 1)
 
-        exp_eye = kern.kernel(np.eye(10), np.eye(10))
+        exp_eye = kern.kernel_mat(np.eye(10), np.eye(10))
         self.assertTrue(np.array_equal(exp_eye, expected_val))
 
     # tests if the shape and value of the subrow is correct
@@ -170,14 +170,14 @@ class TestKernel(unittest.TestCase):
         descr2[0, 0] = 1
 
         kern = kernel.Kernel('linear')
-        subrow = kern.energy_matrix_elements(descr1, descr2)
+        subrow = np.sum(kern.kernel_mat(descr1, descr2), axis=1)
         self.assertEqual(np.shape(subrow), (20, ))
         self.assertEqual(subrow[0], 1)
         self.assertTrue(np.array_equal(subrow[1:], np.zeros(19)))
 
         descr2 = np.eye(20, 10)
 
-        subrow = kern.energy_matrix_elements(descr1, descr2)
+        subrow = np.sum(kern.kernel_mat(descr1, descr2), axis=1)
         self.assertTrue(np.array_equal(subrow[:10], np.ones(10)))
         self.assertTrue(np.array_equal(subrow[10:], np.zeros(10)))
 
