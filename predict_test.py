@@ -27,7 +27,7 @@ def load_data(u_conf: dict) ->  (int, int, np.array, list):
     # build the configurations from the parser
     # IDEA: Build training set.
     configurations = [
-        Configuration(position) for (energy, position, forces) in parser
+        Configuration(position, energy, forces) for (energy, position, forces) in parser
         .build_configurations(stepsize)
     ]
 
@@ -55,16 +55,15 @@ def predict_linear(u_conf: dict, configurations, C: np.array, q) -> (np.array, n
     Loads the calibration data, ntializes the kernel and then builds the linear system with the kernel matrices according to kernel
     '''
     C_cal = np.array(np.loadtxt('calibration_C.out'), dtype=float)
-    w_cal = np.array(np.loadtxt('calibration_w.out'), dtype=float)
-    E_ave, _ = np.array(np.loadtxt('calibration_E.out'), dtype=float)
     
     kern = kernel.Kernel(*u_conf['kernel'])
     n_conf = u_conf['N_conf']
     n_ion = u_conf['N_ion']
-    nc_ni = np.size(w_cal)
+    nc_ni = np.shape(C_cal)[0]
     # will be the super vectors
-    # this holds the matrix-elements in the shape [sum_j K(C^beta_j, C^alpha_i)]^beta_(alpha, i)
-    K = np.zeros((n_conf, nc_ni)) # not really necessary to initialize, as the matrix is built in one piece
+    E = np.zeros(n_conf)
+    # Holds forces flattened
+    F = np.zeros(n_conf * n_ion * 3)
     T = np.zeros((n_conf * n_ion * 3, nc_ni))
     
     # build the linear system
@@ -84,10 +83,12 @@ def predict_linear(u_conf: dict, configurations, C: np.array, q) -> (np.array, n
     t_0 = time()
     for alpha in range(n_conf):
         print(f'Building T: {alpha+1}/{n_conf}', end='\r')
+        E[alpha] = configurations[alpha].energy
+        F[alpha*n_ion*3: (alpha+1)*n_ion*3] = configurations[alpha].forces.flatten()
         T[alpha*n_ion*3:(alpha+1)*n_ion*3] = kern.force_submat(q, configurations[alpha], C_cal)
     print(f'Building T: finished after {time()-t_0:.3} s')
     
-    return (C_cal, w_cal, K, T, E_ave)
+    return (E, F, K, T)
 
 
 def ridge_prediction(K, w):
@@ -112,7 +113,10 @@ def main():
     init_configurations(user_config, configurations, qs, C)
 
     # build the linear system
-    (C_cal, w_cal, K, T, E_ave) = predict_linear(user_config, configurations, C, qs)
+    (E, F, K, T) = predict_linear(user_config, configurations, C, qs)
+    
+    w_cal = np.array(np.loadtxt('calibration_w.out'), dtype=float)
+    E_ave, _ = np.array(np.loadtxt('calibration_E.out'), dtype=float)
     
     t_0 = time()
     # calculate the weights using ridge regression
@@ -120,15 +124,29 @@ def main():
     print('Solving linear system ... ', end='\r')
     EF = ridge_prediction(np.append(K,T, axis=0),w_cal)
     print(f'Solving linear system: finished after {time()-t_0:.3} s')
-
+    
+    E_cal = EF[0:user_config['N_conf']] + E_ave
+    E_msd = np.mean((E - E_cal)**2)
+    F_cal = EF[user_config['N_conf']:] # .reshape((user_config['N_conf'], user_config['N_ion'], 3))
+    F_msd = np.mean((F - F_cal)**2)
+    
     # show results in compact way
-    print("Energies:")
-    print(EF[0:user_config['N_conf']] + E_ave)
-    print("Positions:")
-    print([conf.positions for conf in configurations])
-    print("Forces:")
-    print(EF[user_config['N_conf']:].reshape((user_config['N_conf'], user_config['N_ion'], 3)))
-
-
+    print("calculated Energies have a variance / std-deviation of:")
+    print('{:.5f}'.format(E_msd), "/", '{:.5f}'.format(np.sqrt(E_msd)))
+#    print("Positions:")
+#    print([conf.positions for conf in configurations])
+    print("calculated Forces have a variance / std-deviation of:")
+    print('{:.5f}'.format(F_msd), "/", '{:.5f}'.format(np.sqrt(F_msd)))
+    show = input("Show energies and forces? y:yes, n:no -> ")
+    if show == "y":
+        print("original Energies:")
+        print(E)
+        print("calculated Energies:")
+        print(E_cal)
+        print("original Forces:")
+        print(F.reshape((user_config['N_conf'], user_config['N_ion'], 3)))
+        print("calculated Forces:")
+        print(F_cal.reshape((user_config['N_conf'], user_config['N_ion'], 3)))
+    
 if __name__ == '__main__':
     main()
