@@ -106,7 +106,7 @@ class TestKernel(unittest.TestCase):
     # Test if choosing the kernel works and panics if no sigma is given
     def test_kernel_choice(self):
         kern = kernel.Kernel('linear')
-        self.assertEqual(kern.kernel.__name__, 'linear_kernel', 'does not set linear kernel')
+        self.assertEqual(kern.kernel_mat.__name__, 'linear_kernel', 'does not set linear kernel')
         with self.assertRaises(ValueError):
             kernel.Kernel('gaussian')
 
@@ -114,20 +114,20 @@ class TestKernel(unittest.TestCase):
     def test_linear_energy_matrix_element(self):
         kern = kernel.Kernel('linear')
         descr1 = np.eye(10, 10)
-        zero_el = kern.energy_matrix_elements(descr1, np.zeros(10))
+        zero_el = np.sum(kern.kernel_mat(descr1, np.zeros(10)), axis=0)
         self.assertEqual(type(zero_el), np.float64)
         self.assertEqual(zero_el, 0)
 
         one = np.array([1] + [0 for _ in range(9)])
-        one_el = kern.energy_matrix_elements(descr1, one)
+        one_el = np.sum(kern.kernel_mat(descr1, one), axis=0)
         self.assertEqual(one_el, 1)
 
         one = np.ones(10)
-        ten_el = kern.energy_matrix_elements(descr1, one)
+        ten_el = np.sum(kern.kernel_mat(descr1, one), axis=0)
         self.assertEqual(ten_el, 10)
 
         five = 5 * one
-        fifty_el = kern.energy_matrix_elements(descr1, five)
+        fifty_el = np.sum(kern.kernel_mat(descr1, five), axis=0)
         self.assertEqual(fifty_el, 50)
 
     # tests the correct shape of the energy matrix in the linear case
