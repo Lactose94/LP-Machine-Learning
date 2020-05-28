@@ -50,15 +50,11 @@ def linear_force_submat(q: np.array, config1: configuration, descriptors_array: 
     # cosrq.shape = (nj', ni', nq)
     cosrq = np.cos(rq)
 
-    # cosrq_R.shape = (nj, dim, nq)
-    cosrq_R = np.sum(cosrq.reshape(nj, nj, 1, nq) * R_over_r.reshape(nj, nj, dim, 1), axis=1)
-
     q2 = -2 * q
+    # qcosrq_R.shape = (nj, dim, nq)
+    qcosrq_R = q2 * np.sum(cosrq.reshape(nj, nj, 1, nq) * R_over_r.reshape(nj, nj, dim, 1), axis=1)
 
-    # q2c.shape = (nani, nq)
-    q2c = descriptors_array * q2
-
-    return (cosrq_R @ q2c.T).reshape(nj * dim, nani)
+    return (qcosrq_R @ descriptors_array.T).reshape(nj * dim, nani)
 
 
 # builds part of the row for the force kernel matrix given a configuration and a set of descriptors

@@ -13,7 +13,7 @@ def dist(r1, r2, a=1):
     return dr
 
 class Configuration(object):
-    
+
     def __init__(self, positions, energy=None, forces=None, nndisplace_norm=None, nndistances=None, descriptors=None):
         self.positions = positions
         self.energy = energy
@@ -21,7 +21,7 @@ class Configuration(object):
         self.nndisplace_norm = nndisplace_norm # distances (vector) NORMALIZED (!), with 0 if not NN or self
         self.nndistances = nndistances # distances (scalar) with 0 if not NN or self
         self.descriptors = descriptors
-        
+
     # Diese Funktion erstellt die nearest-neighbour-tables für die Positionen und die Abstände.
     # Dafür muss die float-Variable rcut in Angström übergeben werden.
     def init_nn(self, rcut, lattice):
@@ -30,11 +30,10 @@ class Configuration(object):
         self.nndisplace_norm = np.zeros((n, n, dim)) # 0 if self atom or not NN
         # n x n numpy.array of NN-distances table
         self.nndistances = np.zeros((n, n)) # 0 if self atom or not NN
-        
+
         # get a vector of all lattice constants (primitive orthorhombic or cubic cell)
         a = lattice.diagonal()
-            
-        # TODO: Diese Loops kann man eventuell auch wegrationalisieren!
+
         for i in range(n): # loop over central atoms
             for j in range(i+1,n): # loop over possible nearest neighbours
                 rj_ri = dist(self.positions[i,:], self.positions[j,:], a)
@@ -44,7 +43,7 @@ class Configuration(object):
                     self.nndisplace_norm[j,i,:] = - rj_ri / dr # NN atom - central atom
                     self.nndistances[i,j] = dr
                     self.nndistances[j,i] = dr
-    
+
     # Diese Funktion erstellt die descriptor coefficients der configuration.
     # Dafür muss ein float-Vektor q übergeben werden.
     # Dass dieser mit rcut zusammenpasst wird vorausgesetzt und nicht weiter überprüft.
@@ -56,9 +55,9 @@ class Configuration(object):
             # n x len(q) numpy.array of Descriptor coefficients
             self.descriptors = np.sum(np.sin(np.multiply.outer(self.nndistances, q)), axis=1)
         return
-    
+
 if __name__ == '__main__':
-    
+
     rcut = 4
     q = np.array([np.pi/rcut,2*np.pi/rcut,3*np.pi/rcut])
     lattice = np.array([[10.0 ,  0.0],
@@ -67,16 +66,16 @@ if __name__ == '__main__':
                           [1.0 , 9.0], # hat 2 NN
                           [3.0 , 3.0], # hat 1 NN
                           [9.0 , 9.0]]) # hat 2 NN
-    
+
     # test __init__
     config1 = Configuration(positions)
-    
+
     # test init_nn
     config1.init_nn(rcut, lattice)
     print(config1.nndisplace_norm)
     print(config1.nndistances)
     print(type(config1.nndistances[0]))
-    
+
     # test init_descriptor
     config1.init_descriptor(q)
     print(config1.descriptors)
