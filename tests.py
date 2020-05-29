@@ -97,11 +97,14 @@ class TestCalibration(unittest.TestCase):
 class TestKernel(unittest.TestCase):
     # Tests if the shape and value of the kernel-fcts is the expected
     def test_kernel_values(self):
-        self.assertEqual(kernel.linear_kernel(np.array(1), np.array(0)), 0)
+        self.assertEqual(kernel.linear_kernel(np.array([1, 0]), np.array([0, 0])), 0)
         self.assertEqual(kernel.linear_kernel(np.ones(10), np.ones(10)), 10)
 
-        self.assertEqual(kernel.gaussian_kernel(np.zeros(10), np.zeros(10), 10), 1)
-        self.assertAlmostEqual(kernel.gaussian_kernel(np.array([sqrt(2)*3, 0]), np.zeros(2), 3), exp(1), 7)
+        desc = np.zeros(2).reshape(2, 1)
+        self.assertEqual(kernel.gaussian_kernel(desc, desc, 10)[0, 0], 1)
+        desc1 = np.array([sqrt(2)*3, 0]).reshape(2, 1)
+        desc2 = np.zeros(2).reshape(2, 1)
+        self.assertAlmostEqual(kernel.gaussian_kernel(desc1, desc2, 3)[0, 0], exp(-1), 7)
 
     # Test if choosing the kernel works and panics if no sigma is given
     def test_kernel_choice(self):
