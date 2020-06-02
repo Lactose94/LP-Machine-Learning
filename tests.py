@@ -184,3 +184,63 @@ class TestKernel(unittest.TestCase):
         self.assertTrue(np.array_equal(subrow[:10], np.ones(10)))
         self.assertTrue(np.array_equal(subrow[10:], np.zeros(10)))
 
+    # tests if the linear kernel is self consistent
+    def test_linear_cosistency(self):
+        import json
+        import copy
+
+        import numpy as np
+        import kernel
+        import configuration
+        import calibration
+
+        # load teset data
+        descriptors = np.loadtxt('test_data/c_lin_10.out')
+        weights = np.loadtxt('test_data/w_lin_10.out')
+        with open('test_data/lin_10.json', 'r') as u_conf:
+            user_config = json.load(u_conf)
+
+        # make a list of the allowed qs
+        qs = np.arange(1, user_config['nr_modi']+1) * np.pi / user_config['cutoff']
+
+        # read in data and save parameters for calibration comparison
+        (_, _, lat, configurations) = calibration.load_data(user_config)
+        config = configurations[0]
+
+        # load linear kernel
+        kern = kernel.Kernel(*user_config['kernel'])
+
+        # init descriptors of the test configuration
+        config.init_nn(user_config['cutoff'], lat)
+        config.init_descriptor(qs)
+
+        # make perturbed configs and init them
+        dx = 1e-4
+        config_plus = copy.deepcopy(config)
+        config_minus = copy.deepcopy(config)
+
+        config_plus.positions[0, 0] += dx
+        config_minus.positions[0, 0] -= dx
+
+        config_plus.init_nn(user_config['cutoff'], lat)
+        config_plus.init_descriptor(qs)
+
+        config_minus.init_nn(user_config['cutoff'], lat)
+        config_minus.init_descriptor(qs)
+
+        # build the perturbed matrix elements
+        kplus = np.sum(kern.kernel_mat(config_plus.descriptors, descriptors), axis=0)
+        kminus = np.sum(kern.kernel_mat(config_minus.descriptors, descriptors), axis=0)
+
+        # make the finite difference values
+        eplus = kplus @ weights
+        eminus = kminus @ weights
+
+        # calculate forces by finite differences
+        Fx_finite = (eplus - eminus) / (2 * dx)
+
+        # calculate forces by regression
+        F_reg = kern.force_submat(qs, config, descriptors) @ weights
+
+        self.assertAlmostEqual(Fx_finite, F_reg[0], 6)
+

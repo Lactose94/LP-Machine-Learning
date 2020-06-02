@@ -1,0 +1,1 @@
+{"file_in": "OUTCAR.21", "file_out": "data", "stepsize": 1000, "cutoff": 4, "nr_modi": 10, "lambda": 0.001, "kernel": ["linear", ""]}
