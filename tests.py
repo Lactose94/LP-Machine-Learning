@@ -242,7 +242,7 @@ class TestKernel(unittest.TestCase):
         # calculate forces by regression
         F_reg = kern.force_submat(qs, config, descriptors) @ weights
 
-        print('\n', Fx_finite - F_reg[0])
+        print('\n', f'Linear difference: {Fx_finite - F_reg[0]}')
         self.assertAlmostEqual(Fx_finite, F_reg[0], 6)
 
     def test_gaussian_consistency(self):
@@ -275,7 +275,7 @@ class TestKernel(unittest.TestCase):
         config.init_descriptor(qs)
 
         # make perturbed configs and init them
-        dx = 1e-4
+        dx = 1e-5
         config_plus = copy.deepcopy(config)
         config_minus = copy.deepcopy(config)
 
@@ -301,5 +301,5 @@ class TestKernel(unittest.TestCase):
 
         # calculate forces by regression
         F_reg = kern.force_submat(qs, config, descriptors) @ weights
-        print('\n', Fx_finite - F_reg[0])
-        self.assertAlmostEqual(Fx_finite, F_reg[0], 6)
+        print('\n', f'Gaussian difference: {Fx_finite - F_reg[0]}')
+        self.assertAlmostEqual(Fx_finite, F_reg[0], 7)
