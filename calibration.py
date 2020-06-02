@@ -1,6 +1,7 @@
 import json
 from time import time
 from math import pi
+import os
 import numpy as np
 from outcar_parser import Parser
 from configuration import Configuration
@@ -125,10 +126,14 @@ def main():
     w = ridge_regression(np.append(K,T, axis=0), np.append(E,F, axis=0), user_config['lambda'])
     print(f'Solving linear system: finished after {time()-t_0:.3} s')
 
+    # make a data directory
+    directory = user_config['file_out']
+    if not os.path.exists(directory):
+        os.makedirs(directory)
     # save calibration (file content will be overwritten if file already exists)
-    np.savetxt('calibration_w.out', w)
-    np.savetxt('calibration_C.out', np.reshape(C, (user_config['N_conf'] * user_config['N_ion'], user_config['nr_modi'])))
-    np.savetxt('calibration_E.out', [E_ave, E_ave])
+    np.savetxt(directory + '/calibration_w.out', w)
+    np.savetxt(directory + '/calibration_C.out', np.reshape(C, (user_config['N_conf'] * user_config['N_ion'], user_config['nr_modi'])))
+    np.savetxt(directory + '/calibration_E.out', [E_ave, E_ave])
     # loading: C_cal = np.reshape(np.loadtxt('calibration.out'), (N_conf, N_ion, user_config['nr_modi']))
 
 
