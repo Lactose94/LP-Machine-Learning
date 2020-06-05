@@ -2,13 +2,14 @@ import json
 from time import time
 from math import pi
 import os
+import sys
 import numpy as np
 from outcar_parser import Parser
 from configuration import Configuration
 import kernel
 
 
-def load_data(u_conf: dict) ->  (int, int, np.array, list):
+def load_data(u_conf: dict, offset=0) ->  (int, int, np.array, list):
     '''
     Loads the data from the file specified in u_conf and returns the parameters of the
     simulation as (N_conf, N_ion, lattice vectors, list of configurations)
@@ -26,7 +27,7 @@ def load_data(u_conf: dict) ->  (int, int, np.array, list):
     # IDEA: Build training set.
     configurations = [
         Configuration(position, energy, force) for (energy, position, force) in parser
-        .build_configurations(u_conf['stepsize'])
+        .build_configurations(u_conf['stepsize'], offset)
     ]
 
     return (len(configurations), parser.find_ion_nr(), lattice_vectors, configurations)
@@ -99,7 +100,8 @@ def ridge_regression(K, E, lamb):
 
 def main():
     # load the simulation parameters
-    with open('user_config.json', 'r') as u_conf:
+    config_path = sys.argv[1] if len(sys.argv) > 1 else 'user_config.json'
+    with open(config_path, 'r') as u_conf:
         user_config = json.load(u_conf)
 
     # make a list of the allowed qs
