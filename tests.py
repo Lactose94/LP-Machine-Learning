@@ -82,6 +82,18 @@ class TestParser(unittest.TestCase):
             self.assertTrue(np.array_equal(force[0], g_force), 'returns wrong force')
             self.assertEqual(energy, g_energy, 'returns wrong energy')
 
+    def test_offset(self):
+        test_in = 'OUTCAR.21'
+        ref_pos = np.array([2.23782, 2.37638, 0.06997])
+        ref_force = np.array([-0.130492, -0.307476, -1.951215])
+        ref_energy = -306.56723878
+
+        parser = Parser(test_in)
+
+        for energy, pos, force in parser.build_configurations(10000,1):
+            self.assertEqual(energy, ref_energy)
+            self.assertTrue(np.array_equal(ref_pos, pos[0]))
+            self.assertTrue(np.array_equal(ref_force, force[0]))
 
 class TestCalibration(unittest.TestCase):
 
