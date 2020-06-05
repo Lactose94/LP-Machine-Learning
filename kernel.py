@@ -110,3 +110,11 @@ class Kernel:
             self.force_submat = lambda x, y, z: gaussian_force_mat(x, y, z, args[0])
         else:
             raise ValueError(f'kernel {mode} is not supported')
+
+    def predict(self, qs: np.array, config: configuration, descriptors: np.array, weights: np.array, E_ave: float) -> (float, np.array):
+        ni, _ = config.nndistances.shape
+        K = np.sum(self.kernel_mat(config.descriptors, descriptors), axis=0)
+        E = K @ weights + E_ave
+        F_reg = self.force_submat(qs, config, descriptors) @ weights
+        F_reg = F_reg.reshape(ni, 3)
+        return (E, F_reg)
