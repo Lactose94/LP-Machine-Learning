@@ -52,9 +52,10 @@ def init_configurations(u_conf: dict, configurations: list, q: np.array, C: np.a
 
 def predict_linear(u_conf: dict, configurations, C: np.array, q) -> (np.array, np.array, np.array, np.array):
     '''
-    Loads the calibration data, ntializes the kernel and then builds the linear system with the kernel matrices according to kernel
+    Loads the calibration data, initializes the kernel and then builds the linear system with the kernel matrices according to kernel
     '''
-    C_cal = np.array(np.loadtxt('calibration_C.out'), dtype=float)
+    directory = u_conf['file_out']
+    C_cal = np.array(np.loadtxt(directory + '/calibration_C.out'), dtype=float)
     
     kern = kernel.Kernel(*u_conf['kernel'])
     n_conf = u_conf['N_conf']
@@ -132,8 +133,10 @@ def main(doprint = False):
     # build the linear system
     (E, F, K, T) = predict_linear(user_config, configurations, C, qs)
     
-    w_cal = np.array(np.loadtxt('calibration_w.out'), dtype=float)
-    E_ave, _ = np.array(np.loadtxt('calibration_E.out'), dtype=float)
+    # make a data directory
+    directory = user_config['file_out']
+    w_cal = np.array(np.loadtxt(directory + '/calibration_w.out'), dtype=float)
+    E_ave, _ = np.array(np.loadtxt(directory + '/calibration_E.out'), dtype=float)
     
     t_0 = time()
     # calculate the weights using ridge regression
