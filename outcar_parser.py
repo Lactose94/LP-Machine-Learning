@@ -1,5 +1,5 @@
 from re import match, search, IGNORECASE
-from numpy import array, shape, fromstring, array_equal
+from numpy import array, shape, fromstring, array_equal, diag
 
 
 # Hier werden die patterns und Textbausteine gespeichert, nach denen später das File durchsucht oder aufgespalten wird
@@ -47,9 +47,16 @@ class Parser:
 
         matches = lattice_match.groups()
         lattice_string = list(map(lambda vec_string: vec_string.strip().split(), matches))
-        lattice_float = list(map(lambda list_vecs: self.__convert_list(list_vecs), lattice_string))
+        lattice_float = array(list(map(lambda list_vecs: self.__convert_list(list_vecs), lattice_string)))
 
-        return array(lattice_float)
+        sp_lat  = lattice_float.T @ lattice_float
+        norms = diag(sp_lat)
+        if not (norms[0] == norms[1] == norms[2]):
+            print(f'*************WARNING*************\nThe given lattice vectors\n{lattice_float}\n' \
+                       'do not constitute a simple basic lattice.\n' \
+                       'The programm wont work correctly')
+
+        return lattice_float
 
 
     # Teilt den Inhalt erst in Konfigurationen und findet die Energien, Positionen sowie Kräfte
