@@ -14,13 +14,14 @@ def dist(r1, r2, a=1):
 
 class Configuration(object):
 
-    def __init__(self, positions, energy=None, forces=None, nndisplace_norm=None, nndistances=None, descriptors=None):
+    def __init__(self, positions, energy=None, forces=None, nndisplace_norm=None, nndistances=None, descriptors=None, velocities=None):
         self.positions = positions
         self.energy = energy
         self.forces = forces
         self.nndisplace_norm = nndisplace_norm # distances (vector) NORMALIZED (!), with 0 if not NN or self
         self.nndistances = nndistances # distances (scalar) with 0 if not NN or self
         self.descriptors = descriptors
+        self.velocities = velocities
 
     # Diese Funktion erstellt die nearest-neighbour-tables für die Positionen und die Abstände.
     # Dafür muss die float-Variable rcut in Angström übergeben werden.
