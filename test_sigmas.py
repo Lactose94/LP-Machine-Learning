@@ -105,9 +105,10 @@ def test_sigmas(n: int, modi: int):
         mean_pred.append(prediction[0])
         var_pred.append(prediction[1])
         signs_pred.append(prediction[2])
-        print(sigma, end='\r')
-        np.savetxt(f'test_data/fit_{us_cfg["nr_modi"]}.dat', np.array([sigmas, mean_fit, var_fit, signs_fit]).T)
-        np.savetxt(f'test_data/predict_{us_cfg["nr_modi"]}.dat', np.array([sigmas, mean_pred, var_pred, signs_pred]).T)
+        print(sigma)
+
+    np.savetxt(f'test_data/fit_{n}-{modi}.dat', np.array([sigmas, mean_fit, var_fit, signs_fit]).T)
+    np.savetxt(f'test_data/prediction_{n}-{modi}.dat', np.array([sigmas, mean_pred, var_pred, signs_pred]).T)
 
 
 def main():
@@ -119,3 +120,6 @@ def main():
         n = int(arg_in[1])
         modi = int(arg_in[2])
         test_sigmas(n, modi)
+
+if __name__ == '__main__':
+    main()
