@@ -1,9 +1,1 @@
-{
-    "file_in": "OUTCAR.21",
-    "file_out": "data",
-    "stepsize": 100,
-    "cutoff": 4,
-    "nr_modi": 10,
-    "lambda": 1e-12,
-    "kernel": ["gaussian", 6.25]
-}
+{"file_in": "OUTCAR.21", "file_out": "data", "stepsize": 100, "cutoff": 4, "nr_modi": 10, "lambda": 1e-12, "kernel": ["gaussian", 50.0]}
