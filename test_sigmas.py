@@ -7,6 +7,9 @@ import kernel
 import configuration
 import calibration
 
+def float_to_str(nr: float):
+    return str(nr).replace('.', '')
+
 def test_data(c_path, w_path, e_path, json_path, offset=1, printing=True):
     descriptors = np.loadtxt(c_path)
     weights = np.loadtxt(w_path)
@@ -65,8 +68,8 @@ def test_data(c_path, w_path, e_path, json_path, offset=1, printing=True):
     return(F_mean, F_var,  sign_diff[sign_diff != 0].size)
 
 
-def test_sigmas(n: int, modi: int):
-    sigmas = [i * .25 for i in range(1, n+1)]
+def test_sigmas(n: int, modi: int, step=0.25):
+    sigmas = [i * step for i in range(1, n+1)]
     mean_fit = []
     var_fit = []
     signs_fit = []
@@ -107,19 +110,21 @@ def test_sigmas(n: int, modi: int):
         signs_pred.append(prediction[2])
         print(sigma)
 
-    np.savetxt(f'test_data/fit_{n}-{modi}.dat', np.array([sigmas, mean_fit, var_fit, signs_fit]).T)
-    np.savetxt(f'test_data/prediction_{n}-{modi}.dat', np.array([sigmas, mean_pred, var_pred, signs_pred]).T)
+    step_str = float_to_str(step)
+    np.savetxt(f'test_data/fit_{n}-{modi}-{step_str}.dat', np.array([sigmas, mean_fit, var_fit, signs_fit]).T)
+    np.savetxt(f'test_data/prediction_{n}-{modi}-{step_str}.dat', np.array([sigmas, mean_pred, var_pred, signs_pred]).T)
 
 
 def main():
     arg_in = sys.argv
-    if len(arg_in) != 3:
-        print('please supply nr of 0.25 steps and nr of modis')
+    if len(arg_in) != 4:
+        print('please supply nr of steps, nr of modis and stepsize')
         sys.exit(1)
     else:
         n = int(arg_in[1])
         modi = int(arg_in[2])
-        test_sigmas(n, modi)
+        step = float(arg_in[3])
+        test_sigmas(n, modi, step)
 
 if __name__ == '__main__':
     main()
