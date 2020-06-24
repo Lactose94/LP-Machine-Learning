@@ -50,6 +50,8 @@ def test_data(c_path, w_path, e_path, json_path, offset=1, printing=True):
     signs_reg = np.sign(F_reg)
     signs_ana = np.sign(config.forces)
     sign_diff = signs_reg - signs_ana
+    delta_e = abs(E - config.energy)
+
 
     if printing:
         print('\nPredicted values:')
@@ -65,7 +67,7 @@ def test_data(c_path, w_path, e_path, json_path, offset=1, printing=True):
 
         print(f'Mean norm of difference:\n {F_mean} +- {F_var}')
         print(f'Relative to size of F:\n {F_mean / np.mean(np.linalg.norm(config.forces, axis=1))}')
-    return(F_mean, F_var,  sign_diff[sign_diff != 0].size)
+    return(F_mean, F_var,  sign_diff[sign_diff != 0].size, delta_e)
 
 
 def test_sigmas(n: int, modi: int, step=0.25):
@@ -73,9 +75,11 @@ def test_sigmas(n: int, modi: int, step=0.25):
     mean_fit = []
     var_fit = []
     signs_fit = []
+    e_fit = []
     mean_pred = []
     var_pred = []
     signs_pred = []
+    e_pred = []
     for sigma in sigmas:
         us_cfg = {
             "file_in": "OUTCAR.21",
@@ -104,15 +108,17 @@ def test_sigmas(n: int, modi: int, step=0.25):
         mean_fit.append(fitting[0])
         var_fit.append(fitting[1])
         signs_fit.append(fitting[2])
+        e_fit.append(fitting[3])
 
         mean_pred.append(prediction[0])
         var_pred.append(prediction[1])
         signs_pred.append(prediction[2])
+        e_pred.append(prediction[3])
         print(sigma)
 
     step_str = float_to_str(step)
-    np.savetxt(f'test_data/fit_{n}-{modi}-{step_str}.dat', np.array([sigmas, mean_fit, var_fit, signs_fit]).T)
-    np.savetxt(f'test_data/prediction_{n}-{modi}-{step_str}.dat', np.array([sigmas, mean_pred, var_pred, signs_pred]).T)
+    np.savetxt(f'test_data/fit_{n}-{modi}-{step_str}.dat', np.array([sigmas, mean_fit, var_fit, signs_fit, e_fit]).T)
+    np.savetxt(f'test_data/prediction_{n}-{modi}-{step_str}.dat', np.array([sigmas, mean_pred, var_pred, signs_pred, e_pred]).T)
 
 
 def main():
