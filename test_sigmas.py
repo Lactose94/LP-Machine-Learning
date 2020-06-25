@@ -43,14 +43,18 @@ def test_data(c_path, w_path, e_path, json_path, offset=1, printing=True):
 
     E, F_reg = kern.predict(qs, config, descriptors, weights, e_ave)
 
-    delta_F = F_reg - config.forces
+    norm_F_orig = np.linalg.norm(config.forces, axis=1)
+    norm_F_fitted = np.linalg.norm(F_reg, axis=1)
+    # calculate the mean of the relative deviation from original force
+    delta_F = (F_reg - config.forces) / norm_F_orig.reshape(norm_F_orig.size, 1)
     F_mean = np.mean(np.linalg.norm(delta_F, axis=1))
     F_var = np.var(np.linalg.norm(delta_F, axis=1))
 
-    signs_reg = np.sign(F_reg)
-    signs_ana = np.sign(config.forces)
-    sign_diff = signs_reg - signs_ana
-    delta_e = abs(E - config.energy)
+    cos_forces = (F_reg * config.forces).sum(axis=1) / (norm_F_orig * norm_F_fitted)
+    mean_cos_forces = np.mean(cos_forces)
+    var_cos_forces = np.var(cos_forces)
+    # relative energy difference
+    delta_e = abs((E - config.energy) / config.energy)
 
 
     if printing:
@@ -61,24 +65,30 @@ def test_data(c_path, w_path, e_path, json_path, offset=1, printing=True):
         print('Values from Outcar:')
         print(f'energy = {config.energy}')
         print(f'forces = {config.forces[1]}')
-        print('\nSign differences:', sign_diff[sign_diff != 0].size, 'out of', sign_diff.size)
         #print(sign_diff)
 
 
         print(f'Mean norm of difference:\n {F_mean} +- {F_var}')
         print(f'Relative to size of F:\n {F_mean / np.mean(np.linalg.norm(config.forces, axis=1))}')
-    return(F_mean, F_var,  sign_diff[sign_diff != 0].size, delta_e)
+    return(F_mean, F_var, mean_cos_forces, var_cos_forces, delta_e)
 
 
-def test_sigmas(n: int, modi: int, step=0.25):
-    sigmas = [i * step for i in range(1, n+1)]
-    mean_fit = []
-    var_fit = []
-    signs_fit = []
+def test_sigmas(n: int, min_sigma, max_sigma, modi):
+    # FIXME: for small sigma the predicted force is always zero
+    if min_sigma == 0:
+        sigmas = np.linspace(1e-5, max_sigma, n)
+    else:
+        sigmas = np.linspace(min_sigma, max_sigma, n)
+    meanf_fit = []
+    varf_fit = []
+    meancos_fit = []
+    varcos_fit = []
     e_fit = []
-    mean_pred = []
-    var_pred = []
-    signs_pred = []
+
+    meanf_pred = []
+    varf_pred = []
+    meancos_pred = []
+    varcos_pred = []
     e_pred = []
     for sigma in sigmas:
         us_cfg = {
@@ -105,32 +115,36 @@ def test_sigmas(n: int, modi: int, step=0.25):
                                'user_config.json',
                                1,
                                False)
-        mean_fit.append(fitting[0])
-        var_fit.append(fitting[1])
-        signs_fit.append(fitting[2])
-        e_fit.append(fitting[3])
+        meanf_fit.append(fitting[0])
+        varf_fit.append(fitting[1])
+        meancos_fit.append(fitting[2])
+        varcos_fit.append(fitting[3])
+        e_fit.append(fitting[4])
 
-        mean_pred.append(prediction[0])
-        var_pred.append(prediction[1])
-        signs_pred.append(prediction[2])
-        e_pred.append(prediction[3])
-        print(sigma)
+        meanf_pred.append(prediction[0])
+        varf_pred.append(prediction[1])
+        meancos_pred.append(prediction[2])
+        varcos_pred.append(prediction[3])
+        e_pred.append(prediction[4])
+        print(f'{round((sigma / sigmas[-1]), 1) * 100}%')
 
-    step_str = float_to_str(step)
-    np.savetxt(f'test_data/fit_{n}-{modi}-{step_str}.dat', np.array([sigmas, mean_fit, var_fit, signs_fit, e_fit]).T)
-    np.savetxt(f'test_data/prediction_{n}-{modi}-{step_str}.dat', np.array([sigmas, mean_pred, var_pred, signs_pred, e_pred]).T)
+    stepsize = us_cfg['stepsize']
+    # TODO: update such the nr of configs can also be iterated
+    np.savetxt(f'test_data/fit_{n}_({float_to_str(min_sigma)}-{float_to_str(max_sigma)})_m{modi}_s{stepsize}.dat', np.array([sigmas, meanf_fit, varf_fit, meancos_fit, varcos_fit ,e_fit]).T)
+    np.savetxt(f'test_data/prediction_{n}_({float_to_str(min_sigma)}-{float_to_str(max_sigma)})_m{modi}_s{stepsize}.dat', np.array([sigmas, meanf_pred, varf_pred, meancos_pred, varcos_pred, e_pred]).T)
 
 
 def main():
     arg_in = sys.argv
-    if len(arg_in) != 4:
-        print('please supply nr of steps, nr of modis and stepsize')
+    if len(arg_in) != 5:
+        print('please supply nr of steps, min, max sigma and nr of modi')
         sys.exit(1)
     else:
         n = int(arg_in[1])
-        modi = int(arg_in[2])
-        step = float(arg_in[3])
-        test_sigmas(n, modi, step)
+        min_sigma = float(arg_in[2])
+        max_sigma = float(arg_in[3])
+        modi = int(arg_in[4])
+        test_sigmas(n, min_sigma, max_sigma, modi)
 
 if __name__ == '__main__':
     main()
