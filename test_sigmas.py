@@ -65,7 +65,6 @@ def test_data(c_path, w_path, e_path, json_path, offset=1, printing=True):
         print('Values from Outcar:')
         print(f'energy = {config.energy}')
         print(f'forces = {config.forces[1]}')
-        #print(sign_diff)
 
 
         print(f'Mean norm of difference:\n {F_mean} +- {F_var}')
@@ -94,7 +93,7 @@ def test_sigmas(n: int, min_sigma, max_sigma, modi):
         us_cfg = {
             "file_in": "OUTCAR.21",
             "file_out": "data",
-            "stepsize": 150,
+            "stepsize": 100,
             "cutoff": 4,
             "nr_modi": modi,
             "lambda": 1e-12,
