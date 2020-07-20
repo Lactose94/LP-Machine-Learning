@@ -94,7 +94,7 @@ def test_sigmas(n: int, min_sigma, max_sigma, modi):
         us_cfg = {
             "file_in": "OUTCAR.21",
             "file_out": "data",
-            "stepsize": 100,
+            "stepsize": 150,
             "cutoff": 4,
             "nr_modi": modi,
             "lambda": 1e-12,
