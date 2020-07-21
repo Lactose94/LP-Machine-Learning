@@ -125,7 +125,7 @@ def test_sigmas(n: int, min_sigma, max_sigma, modi):
         meancos_pred.append(prediction[2])
         varcos_pred.append(prediction[3])
         e_pred.append(prediction[4])
-        print(f'{round((sigma / sigmas[-1]), 1) * 100}%')
+        print(f'{round((sigma / sigmas[-1]), 2) * 100}%')
 
     stepsize = us_cfg['stepsize']
     # TODO: update such the nr of configs can also be iterated
