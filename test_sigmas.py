@@ -69,10 +69,11 @@ def test_data(c_path, w_path, e_path, json_path, offset=1, printing=True):
 
         print(f'Mean norm of difference:\n {F_mean} +- {F_var}')
         print(f'Relative to size of F:\n {F_mean / np.mean(np.linalg.norm(config.forces, axis=1))}')
-    return(F_mean, F_var, mean_cos_forces, var_cos_forces, delta_e)
+    return np.array([F_mean, F_var, mean_cos_forces, var_cos_forces, delta_e])
 
 
 def test_sigmas(n: int, min_sigma, max_sigma, modi):
+    N = 10
     # FIXME: for small sigma the predicted force is always zero
     if min_sigma == 0:
         sigmas = np.linspace(1e-5, max_sigma, n)
@@ -93,7 +94,7 @@ def test_sigmas(n: int, min_sigma, max_sigma, modi):
         us_cfg = {
             "file_in": "OUTCAR.21",
             "file_out": "data",
-            "stepsize": 100,
+            "stepsize": 25,
             "cutoff": 4,
             "nr_modi": modi,
             "lambda": 1e-12,
@@ -102,18 +103,27 @@ def test_sigmas(n: int, min_sigma, max_sigma, modi):
         with open('user_config.json', 'w') as json_out:
             json.dump(us_cfg, json_out)
         os.system('python calibration.py')
-        fitting = test_data('data/calibration_C.out',
-                            'data/calibration_w.out',
-                            'data/calibration_E.out',
-                            'user_config.json',
-                            0,
-                            False)
-        prediction = test_data('data/calibration_C.out',
-                               'data/calibration_w.out',
-                               'data/calibration_E.out',
-                               'user_config.json',
-                               1,
-                               False)
+        fitting = np.zeros(5)
+        prediction = np.zeros(5)
+        step = int(round(1000 / us_cfg["stepsize"], 0))
+
+        for i in range(N):
+            print(0 + step * i, 1 + step * i)
+            fitting += test_data('data/calibration_C.out',
+                                'data/calibration_w.out',
+                                'data/calibration_E.out',
+                                'user_config.json',
+                                0 + step * i,
+                                False)
+            prediction += test_data('data/calibration_C.out',
+                                'data/calibration_w.out',
+                                'data/calibration_E.out',
+                                'user_config.json',
+                                1 + step * i,
+                                False)
+        fitting = fitting / N
+        prediction = prediction / N
+
         meanf_fit.append(fitting[0])
         varf_fit.append(fitting[1])
         meancos_fit.append(fitting[2])

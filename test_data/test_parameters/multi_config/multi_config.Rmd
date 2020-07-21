@@ -1,0 +1,239 @@
+---
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .Rmd
+      format_name: rmarkdown
+      format_version: '1.2'
+      jupytext_version: 1.4.2
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
+---
+
+```{python}
+import numpy as np
+from matplotlib import pyplot as plt
+```
+
+```{python}
+def float_to_str(nr: float):
+    nr = float(nr)
+    return str(nr).replace('.', '')
+
+PATH = '/home/lactose/Dropbox/Uni/Laborpraktikum/LP-Machine-Learning/test_data/test_parameters/multi_config'
+```
+
+# Influence of $N_q$
+## Fit
+
+```{python}
+nqs = [8, 10, 12, 14]
+
+legends = []
+fig, axs = plt.subplots(1, 2, figsize = (16, 6))
+titles = ["$\Delta F^ *$", "$\Delta E^*$"]
+axs[0].grid()
+axs[0].set_yscale('log')
+axs[0].set(xlabel="$\sigma$", title=titles[0])
+
+axs[1].grid()
+axs[1].set_yscale('log')
+axs[1].set(xlabel="$\sigma$", title=titles[1])
+
+for modi in nqs:
+    fit_path = f'fit_{20}_({float_to_str(0.0)}-{float_to_str(10.0)})_m{modi}_s{100}.dat'
+    fit = np.loadtxt(fit_path)
+
+    axs[0].scatter(fit[0:, 0], fit[0:, 1], s=20)
+    axs[1].scatter(fit[:, 0], fit[:, -1], s=20)
+    legends.append(f'$N_q=${modi}')
+
+axs[0].legend(legends)
+axs[1].legend(legends)
+
+fig.savefig(PATH + '/fit_nq.png')
+```
+
+```{python}
+nqs = [8, 10, 12, 14]
+
+legends = []
+fig, axs = plt.subplots(1, 2, figsize = (16, 6))
+titles = ["$\Delta F^ *$", "$\Delta E^*$"]
+axs[0].grid()
+axs[0].set_yscale('log')
+axs[0].set(xlabel="$\sigma$", title=titles[0])
+
+axs[1].grid()
+axs[1].set_yscale('log')
+axs[1].set(xlabel="$\sigma$", title=titles[1])
+
+for modi in nqs:
+    fit_path = f'fit_{20}_({float_to_str(0.0)}-{float_to_str(10.0)})_m{modi}_s{100}.dat'
+    fit = np.loadtxt(fit_path)
+
+    axs[0].scatter(fit[5:, 0], fit[5:, 1], s=20)
+    axs[1].scatter(fit[5:, 0], fit[5:, -1], s=20)
+    legends.append(f'$N_q=${modi}')
+
+axs[0].legend(legends)
+axs[1].legend(legends)
+
+fig.savefig(PATH + '/fit_nq_cutoff.png')
+```
+
+## Prediction
+
+```{python}
+nqs = [8, 10, 12, 14]
+
+legends = []
+fig, axs = plt.subplots(1, 2, figsize = (16, 7))
+titles = ["$\Delta F^ *$", "$\Delta E^*$"]
+axs[0].grid()
+axs[0].set_yscale('log')
+axs[0].set(xlabel="$\sigma$", title=titles[0])
+    
+axs[1].grid()
+axs[1].set_yscale('log')
+axs[1].set(xlabel="$\sigma$", title=titles[1])
+
+for modi in nqs:
+    pred_path = f'prediction_{20}_({float_to_str(0.0)}-{float_to_str(10.0)})_m{modi}_s{100}.dat'
+    prediction = np.loadtxt(pred_path)
+
+    axs[0].scatter(prediction[0:, 0], prediction[0:, 1], s=20)
+    axs[1].scatter(prediction[0:, 0], prediction[0:, -1], s=20)
+    legends.append(f'$N_q=${modi}')
+
+axs[0].legend(legends)
+axs[1].legend(legends)
+
+fig.savefig(PATH + '/pred_nq.png')
+```
+
+```{python}
+nqs = [8, 10, 12, 14]
+
+legends = []
+fig, axs = plt.subplots(1, 2, figsize = (16, 7))
+titles = ["$\Delta F^ *$", "$\Delta E^*$"]
+axs[0].grid()
+axs[0].set_yscale('log')
+axs[0].set(xlabel="$\sigma$", title=titles[0])
+
+axs[1].grid()
+axs[1].set_yscale('log')
+axs[1].set(xlabel="$\sigma$", title=titles[1])
+
+for modi in nqs:
+    pred_path = f'prediction_{20}_({float_to_str(0.0)}-{float_to_str(10.0)})_m{modi}_s{100}.dat'
+    prediction = np.loadtxt(pred_path)
+
+    axs[0].scatter(prediction[5:, 0], prediction[5:, 1], s=20)
+    axs[1].scatter(prediction[5:, 0], prediction[5:, -1], s=20)
+    legends.append(f'$N_q=${modi}')
+
+axs[0].legend(legends)
+axs[1].legend(legends)
+
+fig.savefig(PATH + '/pred_nq_cutoff.png')
+```
+
+# Influence of nr of configurations
+# Fitting
+
+```{python}
+
+steps = [25, 50,100, 150]
+
+legends = []
+fig, axs = plt.subplots(1, 2, figsize = (16, 6))
+titles = ["$\Delta F^ *$", "$\Delta E^*$"]
+axs[0].grid()
+axs[0].set_yscale('log')
+axs[1].grid()
+axs[1].set(xlabel="$\sigma$", title=titles[1])
+
+for step in steps:
+    fit_path = f'fit_{20}_({float_to_str(0.0)}-{float_to_str(10.0)})_m{10}_s{step}.dat'
+    fit = np.loadtxt(fit_path)
+
+    axs[0].scatter(fit[0:, 0], fit[0:, 1], s=20)
+    axs[0].set(xlabel="$\sigma$", title=titles[0])
+    axs[1].scatter(fit[:, 0], fit[:, -1], s=20)
+    legends.append(f'$N_c=${round(1000 / step, 0)}')
+
+axs[0].legend(legends)
+axs[1].legend(legends)
+
+fig.savefig(PATH + '/fit_nc.png')
+```
+
+```{python}
+
+steps = [25, 50,100, 150]
+
+legends = []
+fig, axs = plt.subplots(1, 2, figsize = (16, 6))
+titles = ["$\Delta F^ *$", "$\Delta E^*$"]
+axs[0].grid()
+axs[0].set_yscale('log')
+axs[1].grid()
+axs[1].set(xlabel="$\sigma$", title=titles[1])
+
+for step in steps:
+    fit_path = f'fit_{20}_({float_to_str(0.0)}-{float_to_str(10.0)})_m{10}_s{step}.dat'
+    fit = np.loadtxt(fit_path)
+
+    axs[0].scatter(fit[5:, 0], fit[5:, 1], s=20)
+    axs[0].set(xlabel="$\sigma$", title=titles[0])
+    axs[1].scatter(fit[5:, 0], fit[5:, -1], s=20)
+    legends.append(f'$N_c=${round(1000 / step, 0)}')
+
+axs[0].legend(legends)
+axs[1].legend(legends)
+
+fig.savefig(PATH + '/fit_nc_cutoff.png')
+```
+
+## Prediction
+
+```{python}
+
+steps = [25, 50,100, 150]
+
+legends = []
+fig, axs = plt.subplots(1, 2, figsize = (16, 6))
+titles = ["$\Delta F^ *$", "$\Delta E^*$"]
+axs[0].grid()
+axs[0].set_yscale('log')
+axs[0].set(xlabel="$\sigma$", title=titles[0])
+    
+axs[1].grid()
+axs[1].set_yscale('log')
+axs[1].set(xlabel="$\sigma$", title=titles[1])
+
+for step in steps:
+    pred_path = f'prediction_{20}_({float_to_str(0.0)}-{float_to_str(10.0)})_m{10}_s{step}.dat'
+    prediction = np.loadtxt(pred_path)
+
+    axs[0].scatter(prediction[0:, 0], prediction[0:, 1], s=20)
+    axs[1].scatter(prediction[:, 0], prediction[:, -1], s=20)
+    legends.append(f'$N_c=${round(1000 / step, 0)}')
+
+axs[0].legend(legends)
+axs[1].legend(legends)
+
+fig.savefig(PATH + '/pred_nc.png')
+```
+
+```{python}
+
+```
+
+```{python}
+
+```
