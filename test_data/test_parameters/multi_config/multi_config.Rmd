@@ -36,11 +36,11 @@ fig, axs = plt.subplots(1, 2, figsize = (16, 6))
 titles = ["$\Delta F^ *$", "$\Delta E^*$"]
 axs[0].grid()
 axs[0].set_yscale('log')
-axs[0].set(xlabel="$\sigma$", title=titles[0])
+axs[0].set(xlabel="$\sigma$", ylabel=titles[0])
 
 axs[1].grid()
 axs[1].set_yscale('log')
-axs[1].set(xlabel="$\sigma$", title=titles[1])
+axs[1].set(xlabel="$\sigma$", ylabel=titles[1])
 
 for modi in nqs:
     fit_path = f'fit_{20}_({float_to_str(0.0)}-{float_to_str(10.0)})_m{modi}_s{100}.dat'
@@ -64,11 +64,11 @@ fig, axs = plt.subplots(1, 2, figsize = (16, 6))
 titles = ["$\Delta F^ *$", "$\Delta E^*$"]
 axs[0].grid()
 axs[0].set_yscale('log')
-axs[0].set(xlabel="$\sigma$", title=titles[0])
+axs[0].set(xlabel="$\sigma$", ylabel=titles[0])
 
 axs[1].grid()
 axs[1].set_yscale('log')
-axs[1].set(xlabel="$\sigma$", title=titles[1])
+axs[1].set(xlabel="$\sigma$", ylabel=titles[1])
 
 for modi in nqs:
     fit_path = f'fit_{20}_({float_to_str(0.0)}-{float_to_str(10.0)})_m{modi}_s{100}.dat'
@@ -94,11 +94,11 @@ fig, axs = plt.subplots(1, 2, figsize = (16, 7))
 titles = ["$\Delta F^ *$", "$\Delta E^*$"]
 axs[0].grid()
 axs[0].set_yscale('log')
-axs[0].set(xlabel="$\sigma$", title=titles[0])
+axs[0].set(xlabel="$\sigma$", ylabel=titles[0])
     
 axs[1].grid()
 axs[1].set_yscale('log')
-axs[1].set(xlabel="$\sigma$", title=titles[1])
+axs[1].set(xlabel="$\sigma$", ylabel=titles[1])
 
 for modi in nqs:
     pred_path = f'prediction_{20}_({float_to_str(0.0)}-{float_to_str(10.0)})_m{modi}_s{100}.dat'
@@ -122,11 +122,11 @@ fig, axs = plt.subplots(1, 2, figsize = (16, 7))
 titles = ["$\Delta F^ *$", "$\Delta E^*$"]
 axs[0].grid()
 axs[0].set_yscale('log')
-axs[0].set(xlabel="$\sigma$", title=titles[0])
+axs[0].set(xlabel="$\sigma$", ylabel=titles[0])
 
 axs[1].grid()
 axs[1].set_yscale('log')
-axs[1].set(xlabel="$\sigma$", title=titles[1])
+axs[1].set(xlabel="$\sigma$", ylabel=titles[1])
 
 for modi in nqs:
     pred_path = f'prediction_{20}_({float_to_str(0.0)}-{float_to_str(10.0)})_m{modi}_s{100}.dat'
@@ -153,16 +153,18 @@ legends = []
 fig, axs = plt.subplots(1, 2, figsize = (16, 6))
 titles = ["$\Delta F^ *$", "$\Delta E^*$"]
 axs[0].grid()
+axs[0].set(xlabel="$\sigma$", ylabel=titles[0])
 axs[0].set_yscale('log')
+
 axs[1].grid()
-axs[1].set(xlabel="$\sigma$", title=titles[1])
+axs[1].set(xlabel="$\sigma$", ylabel=titles[1])
+axs[1].set_yscale('log')
 
 for step in steps:
     fit_path = f'fit_{20}_({float_to_str(0.0)}-{float_to_str(10.0)})_m{10}_s{step}.dat'
     fit = np.loadtxt(fit_path)
 
     axs[0].scatter(fit[0:, 0], fit[0:, 1], s=20)
-    axs[0].set(xlabel="$\sigma$", title=titles[0])
     axs[1].scatter(fit[:, 0], fit[:, -1], s=20)
     legends.append(f'$N_c=${round(1000 / step, 0)}')
 
@@ -181,15 +183,17 @@ fig, axs = plt.subplots(1, 2, figsize = (16, 6))
 titles = ["$\Delta F^ *$", "$\Delta E^*$"]
 axs[0].grid()
 axs[0].set_yscale('log')
+axs[0].set(xlabel="$\sigma$", ylabel=titles[0])
+
 axs[1].grid()
-axs[1].set(xlabel="$\sigma$", title=titles[1])
+axs[1].set_yscale('log')
+axs[1].set(xlabel="$\sigma$", ylabel=titles[1])
 
 for step in steps:
     fit_path = f'fit_{20}_({float_to_str(0.0)}-{float_to_str(10.0)})_m{10}_s{step}.dat'
     fit = np.loadtxt(fit_path)
 
     axs[0].scatter(fit[5:, 0], fit[5:, 1], s=20)
-    axs[0].set(xlabel="$\sigma$", title=titles[0])
     axs[1].scatter(fit[5:, 0], fit[5:, -1], s=20)
     legends.append(f'$N_c=${round(1000 / step, 0)}')
 
@@ -203,18 +207,18 @@ fig.savefig(PATH + '/fit_nc_cutoff.png')
 
 ```{python}
 
-steps = [25, 50,100, 150]
+steps = [25, 50, 100, 150]
 
 legends = []
 fig, axs = plt.subplots(1, 2, figsize = (16, 6))
 titles = ["$\Delta F^ *$", "$\Delta E^*$"]
 axs[0].grid()
 axs[0].set_yscale('log')
-axs[0].set(xlabel="$\sigma$", title=titles[0])
+axs[0].set(xlabel="$\sigma$", ylabel=titles[0])
     
 axs[1].grid()
 axs[1].set_yscale('log')
-axs[1].set(xlabel="$\sigma$", title=titles[1])
+axs[1].set(xlabel="$\sigma$", ylabel=titles[1])
 
 for step in steps:
     pred_path = f'prediction_{20}_({float_to_str(0.0)}-{float_to_str(10.0)})_m{10}_s{step}.dat'
@@ -231,7 +235,31 @@ fig.savefig(PATH + '/pred_nc.png')
 ```
 
 ```{python}
+steps = [25, 50, 100, 150]
 
+legends = []
+fig, axs = plt.subplots(1, 2, figsize = (16, 6))
+titles = ["$\Delta F^ *$", "$\Delta E^*$"]
+axs[0].grid()
+axs[0].set_yscale('log')
+axs[0].set(xlabel="$\sigma$", ylabel=titles[0])
+    
+axs[1].grid()
+axs[1].set_yscale('log')
+axs[1].set(xlabel="$\sigma$", ylabel=titles[1])
+
+for step in steps:
+    pred_path = f'prediction_{20}_({float_to_str(0.0)}-{float_to_str(10.0)})_m{10}_s{step}.dat'
+    prediction = np.loadtxt(pred_path)
+
+    axs[0].scatter(prediction[5:, 0], prediction[5:, 1], s=20)
+    axs[1].scatter(prediction[5:, 0], prediction[5:, -1], s=20)
+    legends.append(f'$N_c=${round(1000 / step, 0)}')
+
+axs[0].legend(legends)
+axs[1].legend(legends)
+
+fig.savefig(PATH + '/pred_nc.png')
 ```
 
 ```{python}
