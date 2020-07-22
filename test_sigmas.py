@@ -94,7 +94,7 @@ def test_sigmas(n: int, min_sigma, max_sigma, modi):
         us_cfg = {
             "file_in": "OUTCAR.21",
             "file_out": "data",
-            "stepsize": 25,
+            "stepsize": 50,
             "cutoff": 4,
             "nr_modi": modi,
             "lambda": 1e-12,
@@ -135,7 +135,7 @@ def test_sigmas(n: int, min_sigma, max_sigma, modi):
         meancos_pred.append(prediction[2])
         varcos_pred.append(prediction[3])
         e_pred.append(prediction[4])
-        print(f'{round((sigma / sigmas[-1]), 2) * 100}%')
+        print(f'{round((sigma / sigmas[-1]), 3) * 100}%')
 
     stepsize = us_cfg['stepsize']
     # TODO: update such the nr of configs can also be iterated
