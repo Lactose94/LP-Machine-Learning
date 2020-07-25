@@ -61,7 +61,6 @@ class Parser:
 
     # Teilt den Inhalt erst in Konfigurationen und findet die Energien, Positionen sowie Kräfte
     # und baut daraus einen Iterator
-    # IDEA: normalize data by subtracting the mean of the enregies
     def build_configurations(self, step_size: int, offset=0) -> (float, array, array):
         # Teilt den Inhalt an den in SPLIT_CONFIGS angegebenen Zeilen, die recht zuverlässig die einzelnen
         # Konfigurationen trennen sollten, wählt anschließend jede step_size-te Konfiguration aus

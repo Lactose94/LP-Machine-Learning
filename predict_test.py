@@ -14,7 +14,7 @@ def load_data(u_conf: dict, stepsize=0) ->  (int, int, np.array, list):
     '''
     if stepsize == 0:
         stepsize = int(input("Stepsize for prediction? (integer): -> "))
-    
+
     # load parser and save nr of ions and lattice vectors
     parser = Parser(u_conf['file_in'])
     lattice_vectors = parser.find_lattice_vectors()
@@ -25,7 +25,6 @@ def load_data(u_conf: dict, stepsize=0) ->  (int, int, np.array, list):
         raise ValueError('Cutoff cannot be bigger than half the lattice constants')
 
     # build the configurations from the parser
-    # IDEA: Build training set.
     configurations = [
         Configuration(position, energy, forces) for (energy, position, forces) in parser
         .build_configurations(stepsize)
@@ -56,7 +55,7 @@ def predict_linear(u_conf: dict, configurations, C: np.array, q) -> (np.array, n
     '''
     directory = u_conf['file_out']
     C_cal = np.array(np.loadtxt(directory + '/calibration_C.out'), dtype=float)
-    
+
     kern = kernel.Kernel(*u_conf['kernel'])
     n_conf = u_conf['N_conf']
     n_ion = u_conf['N_ion']
@@ -66,9 +65,9 @@ def predict_linear(u_conf: dict, configurations, C: np.array, q) -> (np.array, n
     # Holds forces flattened
     F = np.zeros(n_conf * n_ion * 3)
     T = np.zeros((n_conf * n_ion * 3, nc_ni))
-    
+
     # build the linear system
-    
+
     t_0 = time()
     print('Building K ...', end='\r')
     descr_new = C.reshape(n_conf * n_ion, len(q))
@@ -80,7 +79,7 @@ def predict_linear(u_conf: dict, configurations, C: np.array, q) -> (np.array, n
         axis=1
     )
     print(f'Building K: finished after {time()-t_0:.3} s')
-    
+
     t_0 = time()
     for alpha in range(n_conf):
         print(f'Building T: {alpha+1}/{n_conf}', end='\r')
@@ -88,7 +87,7 @@ def predict_linear(u_conf: dict, configurations, C: np.array, q) -> (np.array, n
         F[alpha*n_ion*3: (alpha+1)*n_ion*3] = configurations[alpha].forces.flatten()
         T[alpha*n_ion*3:(alpha+1)*n_ion*3] = kern.force_submat(q, configurations[alpha], C_cal)
     print(f'Building T: finished after {time()-t_0:.3} s')
-    
+
     return (E, F, K, T)
 
 
@@ -132,37 +131,36 @@ def main(doprint = False):
 
     # build the linear system
     (E, F, K, T) = predict_linear(user_config, configurations, C, qs)
-    
+
     # make a data directory
     directory = user_config['file_out']
     w_cal = np.array(np.loadtxt(directory + '/calibration_w.out'), dtype=float)
     E_ave, _ = np.array(np.loadtxt(directory + '/calibration_E.out'), dtype=float)
-    
+
     t_0 = time()
     # calculate the weights using ridge regression
-    # IDEA: get quality of the fit with the sklearn function
     print('Solving linear system ... ', end='\r')
     EF = ridge_prediction(np.append(K,T, axis=0),w_cal)
     print(f'Solving linear system: finished after {time()-t_0:.3} s')
-    
+
     E_cal = EF[0:user_config['N_conf']] + E_ave
     E_msd = np.mean((E - E_cal)**2)
     F_cal = EF[user_config['N_conf']:] # .reshape((user_config['N_conf'], user_config['N_ion'], 3))
     F_msd = np.mean((F - F_cal)**2)
-    
+
     # show results in compact way
     if doprint:
         print_results(
-            E, 
-            E_cal, 
-            E_msd, 
-            F.reshape((user_config['N_conf'], user_config['N_ion'], 3)), 
-            F_cal.reshape((user_config['N_conf'], user_config['N_ion'], 3)), 
+            E,
+            E_cal,
+            E_msd,
+            F.reshape((user_config['N_conf'], user_config['N_ion'], 3)),
+            F_cal.reshape((user_config['N_conf'], user_config['N_ion'], 3)),
             F_msd
     )
-    
+
     return E_msd, F_msd
-    
+
 if __name__ == '__main__':
     main(True) # printing results = True
-    
+

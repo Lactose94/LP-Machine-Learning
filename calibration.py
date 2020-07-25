@@ -12,7 +12,7 @@ import kernel
 def load_data(u_conf: dict, offset=0) ->  (int, int, np.array, list):
     '''
     Loads the data from the file specified in u_conf and returns the parameters of the
-    simulation as (N_conf, N_ion, lattice vectors, list of configurations)
+    simulation as (N_conf, N_ion, lattice vectors, list of configurations).
     '''
     # load parser and save nr of ions and lattice vectors
     parser = Parser(u_conf['file_in'])
@@ -24,7 +24,6 @@ def load_data(u_conf: dict, offset=0) ->  (int, int, np.array, list):
         raise ValueError('Cutoff cannot be bigger than half the lattice constants')
 
     # build the configurations from the parser
-    # IDEA: Build training set.
     configurations = [
         Configuration(position, energy, force) for (energy, position, force) in parser
         .build_configurations(u_conf['stepsize'], offset)
@@ -49,7 +48,7 @@ def init_configurations(u_conf: dict, configurations: list, q: np.array, C: np.a
     print(f'calculating NN and descriptors: finished after {time()-t_0:.3} s')
 
 
-def build_linear(u_conf: dict, configurations, C: np.array, q) -> (np.array, np.array, np.array, np.array):
+def build_linear(u_conf: dict, configurations: list, C: np.array, q: np.array) -> (np.array, np.array, np.array, np.array):
     '''
     Intializes the kernel and then builds the linear system with the kernel matrices according to kernel.
     Already normalizes the data to <E> = 0.
