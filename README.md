@@ -106,7 +106,7 @@ This class is a wrapper to consistently use the choosen Kernel type for energies
 - **`kernel`**: Holds the choosen kernel type as function.
 - **`force_submat`**: Holds the function that builds part of the derivative/force matrix of the corresponding choosen kernel.
 #### Methods:
-- **`predict(self, qs: np.array, config: configuration, descriptors: np.array, weights: np.array, E_ave: float) -> (float, np.array)`**: Predicts the energy and forces for the given configuration. Takes as arguments the q-vector, the configuration for which one wants to predict values, the set of descriptors used in training the model, the set of weights calculated in training the model and the average energy of the configurations used to train the model. 
+- **`predict(self, qs: np.array, config: configuration, descriptors: np.array, weights: np.array, E_ave: float) -> (float, np.array)`**: Predicts the energy and forces for the given configuration. Takes as arguments the q-vector, the configuration for which one wants to predict values, the set of descriptors used in training the model, the set of weights calculated in training the model and the average energy of the configurations used to train the model and returns the energy and forces predicted by the model.
 ---
 ## Calibration
 This package bundles the functionality of the previous packages and is used to perform the actual machine learning.  
