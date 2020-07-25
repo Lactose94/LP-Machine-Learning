@@ -1,12 +1,13 @@
 # LP-Machine-Learning
 Laborpraktikum Machine Learning ML_LiqiudSI.
-## outcar_parser  
-
+## outcar_parser:
 The purpose of the parser is to handle loading and processing of the outcar file. It allows to read number of ions, direct lattice vectors, as well as positions, forces and energies.
+
 ---  
 
-**Attention**:
+**Attention**:  
 The program is based upon the form of given outcar file. Changes of this form will break the parser.
+
 ---
 The package contains one central class:
 ### The parser class:
@@ -85,14 +86,26 @@ Diese muss zumindest mit einer Positions-Matrix der Ionen initialisiert werden. 
 
   Dabei sind r_i und r_j die Positionsvektoren der Atome i und j, und C_i ein Vektor der gleichen Länge wie der Vektor q.
 
-  ### Tests:
-  Tests können aufgerufen werden durch
-  ```bash
-  python -m unittest -v tests.py
-  ```
-### Tests:
+#### Tests:
 Mit dummy-Konfigurationen werden die einzelnen Funktionen der Klasse getestet.
 
+---
+
+## Kernel
+This package focuses on bundeling all the kernel related functions and give the user consistent access to them.
+### functions:
+- **`linear_kernel(descr_list1: np.array, descr_list2: np.array) -> np.array:`** Given two arrays of descriptors, this function calculates the Kernel matrix of the linear kernel as described in equation (??) of the mathematical documentation.
+- **`gaussian_kernel(descr_list1: np.array, descr_list2: np.array, sigma: float) -> np.array:`** Given two arrays of descriptors, this function calculates the Kernel matrix of the gaussian kernel as described in equation (??) of the mathematical documentation.
+- **`linear_force_submat(q: np.array, config1: configuration, descriptors_array: np.array) -> np.array:`** Given the modi one configuration and one array of descriptors, this functions builds the $N_{ion} * 3$ x $N_{ion} \cdot N_{conf}$ submatrix for T in equation (??) for one fixed configuration beta in the linear case.
+- **`gaussian_force_mat(q: np.array, config1: configuration, descriptors_array: np.array, sigma: float) -> np.array:`** Given the modi one configuration and one array of descriptors, this functions builds the $N_{ion} * 3$ x $N_{ion} \cdot N_{conf}$ submatrix for T in equation (??) for one fixed configuration beta in the Gaussian case.
+
+### The Kernel class
+This class is a wrapper to consistently use the choosen Kernel type for energies and forces.
+#### variables:
+- **`kernel`**: Holds the choosen kernel type as function.
+- **`force_submat`**: Holds the function that builds part of the derivative/force matrix of the corresponding choosen kernel.
+#### Methods:
+- **`predict(self, qs: np.array, config: configuration, descriptors: np.array, weights: np.array, E_ave: float) -> (float, np.array)`**: Predicts the energy and forces for the given configuration. Takes as arguments the q-vector, the configuration for which one wants to predict values, the set of descriptors used in training the model, the set of weights calculated in training the model and the average energy of the configurations used to train the model. 
 ---
 ## Calibration
 Dieses package bündelt die vorherigen packages und nutzt diese um das eigentliche Machine Learning durchzuführen.
@@ -104,17 +117,3 @@ Der Benutzer legt dabei die Parameter des Machine Learnings durch einträge in d
 - **`lambda`**: Parameter, welcher für die Ridge-Regression genutzt werden soll.
 - **`Kernel`**: Welcher Kernel für die Entwicklung der lokalen Energie genutzt werden sollen und eventuell zusätzliche Parameter, z.B. das Sigma für den gaussian Kernel  . Bisher werden nur `linear` und `gaussian` unterstützt.
 
----
-## Kernel
-This package focuses on bundeling all the kernel related functions and give the user consistent acess.
-### functions:
-- **`linear_kernel(descr_list1: np.array, descr_list2: np.array) -> np.array:`** Given two arrays of descriptors, this function calculates the Kernel matrix of the linear kernel as described in equation (11) of the mathematical documentation.
-- **`gaussian_kernel(descr_list1: np.array, descr_list2: np.array, sigma: float) -> np.array:`** Given two arrays of descriptors, this function calculates the Kernel matrix of the gaussian kernel as described in equation (12) of the mathematical documentation.
-- **`grad_scalar(q: float, dr: np.array) -> np.array:`** The gradient of a descriptor is the sum over a scalar prefactor times a difference-vector. This function builds the scalar prefactors from an array of distances. Compare to equation (13).
-- **`linear_force_submat(q: np.array, config1: configuration, descriptors_array: np.array) -> np.array:`** Builds one row for the linear matrix element, needed for fitting teh forces. This implements the equation (15) for one fixed configuration beta.
-
-### The Kernel class
-This class is a wrapper to consistently use the choosen Kernel type for energies and forces.
-#### variables:
-- **`kernel`**: Holds the choosen kernel type as function.
-- **`force_mat`**: Holds the derivative/force matrix function of the corresponding choosen kernel.
