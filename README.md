@@ -47,6 +47,7 @@ The regex patterns used for parsing the file can be found in the beginning of th
   After that the string corresponding to the configuration is split at the lines consisting of 83 times "-", the first one contains the position and force vectors, which are maped linewise to floats and then converted to numpy arrays, which are then split into positions and forces.  
   Should the shape of forces not match the shape of positions a `RuntimeError` is thrown.
   Finally returns the three quantities as tuple *(nergy, positions, forces)*.  
+  
 ---
 ## Configurations
 Dieses Package dient dazu die einzelnen Konfigurationen der Ionen zu speichern, und zu verarbeiten. Es beinhaltet die Configurations-Klasse, dessen Instanzen je eine Ionen-Konfiguration und ihre Eigenschaften darstellen.
@@ -108,12 +109,20 @@ This class is a wrapper to consistently use the choosen Kernel type for energies
 - **`predict(self, qs: np.array, config: configuration, descriptors: np.array, weights: np.array, E_ave: float) -> (float, np.array)`**: Predicts the energy and forces for the given configuration. Takes as arguments the q-vector, the configuration for which one wants to predict values, the set of descriptors used in training the model, the set of weights calculated in training the model and the average energy of the configurations used to train the model. 
 ---
 ## Calibration
-Dieses package bündelt die vorherigen packages und nutzt diese um das eigentliche Machine Learning durchzuführen.
-Der Benutzer legt dabei die Parameter des Machine Learnings durch einträge in der Datei `user_config.json` fest. Im folgenden werden die Parameter erläutert:
-- **`file_in`**: Hier wird der Pfad zum *outcar*-file, welches die Trainingsdaten enthält, eingetragen.
-- **`stepsize`**: Hier gibt der Benutzer an, wie viele Konfigurationen beim Einlesen übersprungen werden sollen. Selbst wenn die Anzahl verfügbarer Konfigurationen überschritten wird, wird immer mindestens eine eingelesen.
-- **`cutoff`**: Hier gibt der Benutzer den Radius der Cutoff-Sphere in Angstroem an.
-- **`nr_modi`**: Gibt an, welche Länge die Descriptor-Vektoren haben sollen.
-- **`lambda`**: Parameter, welcher für die Ridge-Regression genutzt werden soll.
-- **`Kernel`**: Welcher Kernel für die Entwicklung der lokalen Energie genutzt werden sollen und eventuell zusätzliche Parameter, z.B. das Sigma für den gaussian Kernel  . Bisher werden nur `linear` und `gaussian` unterstützt.
+This package bundles the functionality of the previous packages and is used to perform the actual machine learning.  
+The program takes as command line parameter the name of a json-file, which contains the parameters of the machine learning. If none is given, the program defaults to the file `user_config.json`. The json-file has to contain the following parameters: 
+- **`file_in`**: Sets the path to the *outcar*-file which contains the training data.  
+- **`file_out:`** Sets the folder where the result is saved. Will create a folder if none exists under the given path.
+- **`stepsize`**: Sets how many configurations are skipped while reading the outcar-file. See documentation for the `outcar_parser` file.
+- **`cutoff`**: Sets the radius of the cutoff-cphere in angstroem.
+- **`nr_modi`**: Sets how many modes are used for the descriptors (i.e. equals $N_q$).
+- **`lambda`**: Sets the ridge parameter $\lambda$.
+- **`Kernel`**: Sets if the linear or the Gaussian kernel is used. If Gaussian is choosen one also has to supply a sigma. Can only take the values [`linear`] and [`gaussian`, sigma].
 
+### Functions:
+- **`load_data(u_conf: dict, offset=0) ->  (int, int, np.array, list):`** Loads the data from the file specified in u_conf (where u_conf should contain the values of the given json-file) and returns the parameters of the simulation as (N_conf, N_ion, lattice vectors, list of configurations). The offset is given to the outcar_parser as before.
+- **`init_configurations(u_conf: dict, configurations: list, q: np.array, C: np.array):`** Initializes the nearest neighbors and descriptors. Writes values for the descriptors into the C array. Choosen this way, to only have sideeffects and no return. Takes as input the the values of the json file, a list of configurations, the q-vector and an array for the descriptors, which will be overwritten with the descriptors. 
+- **`build_linear(u_conf: dict, configurations: list, C: np.array, q: np.array) -> (np.array, np.array, np.array, np.array):`** Intializes the kernel and then builds the linear system as in equation (??) with the kernel matrices according to the kernel choosen in u_conf. Already normalizes the data to <E> = 0.  
+  Takes as input the values of the json file, a list of configurations used to set up the linear system, the descriptors calculated from those configurations and the q-vector.
+- **`def ridge_regression(K, E, lamb):`** Performs the ridge regression on the matrix K, given the data E, with ridge parameter lamb as in equation (??).
+- **`main():`** Loads the json file and runs the above functions in the correct order, to read the training data, initialize the configurations, build  the linear system, solve the linear system and save the result in the correct folder.
