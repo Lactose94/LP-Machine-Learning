@@ -49,7 +49,6 @@ def test_data(c_path, w_path, e_path, json_path, offset=1, printing=True):
     delta_F = (F_reg - config.forces) / norm_F_orig.reshape(norm_F_orig.size, 1)
     F_mean = np.mean(np.linalg.norm(delta_F, axis=1))
     F_var = np.var(np.linalg.norm(delta_F, axis=1))
-
     cos_forces = (F_reg * config.forces).sum(axis=1) / (norm_F_orig * norm_F_fitted)
     mean_cos_forces = np.mean(cos_forces)
     var_cos_forces = np.var(cos_forces)
@@ -94,7 +93,7 @@ def test_sigmas(n: int, min_sigma, max_sigma, modi):
         us_cfg = {
             "file_in": "OUTCAR.21",
             "file_out": "data",
-            "stepsize": 50,
+            "stepsize": 100,
             "cutoff": 4,
             "nr_modi": modi,
             "lambda": 1e-12,

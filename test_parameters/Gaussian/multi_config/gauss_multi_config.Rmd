@@ -15,6 +15,7 @@ jupyter:
 ```{python}
 import numpy as np
 from matplotlib import pyplot as plt
+import tikzplotlib
 ```
 
 ```{python}
@@ -22,7 +23,7 @@ def float_to_str(nr: float):
     nr = float(nr)
     return str(nr).replace('.', '')
 
-PATH = '/home/lactose/Dropbox/Uni/Laborpraktikum/LP-Machine-Learning/test_data/test_parameters/multi_config'
+PATH = '/home/lactose/Dropbox/Uni/Laborpraktikum/LP-Machine-Learning/test_parameters/Gaussian/multi_config'
 ```
 
 # Influence of $N_q$
@@ -52,8 +53,8 @@ for modi in nqs:
 
 axs[0].legend(legends)
 axs[1].legend(legends)
-
-fig.savefig(PATH + '/fit_nq.png')
+fig.suptitle('Influence of $N_q$ on quality of fit', fontsize=20)
+fig.savefig(PATH + '/fit_nq.png', format='png', dpi=440)
 ```
 
 ```{python}
@@ -81,7 +82,9 @@ for modi in nqs:
 axs[0].legend(legends)
 axs[1].legend(legends)
 
-fig.savefig(PATH + '/fit_nq_cutoff.png')
+
+fig.suptitle('Influence of $N_q$ on quality of fit (smaller range)', fontsize=20)
+fig.savefig(PATH + '/fit_nq_cutoff.png', format='png', dpi=440)
 ```
 
 ## Prediction
@@ -111,7 +114,9 @@ for modi in nqs:
 axs[0].legend(legends)
 axs[1].legend(legends)
 
-fig.savefig(PATH + '/pred_nq.png')
+
+fig.suptitle('Influence of $N_q$ on quality of prediction', fontsize=20)
+fig.savefig(PATH + '/pred_nq.png', format='png', dpi=440)
 ```
 
 ```{python}
@@ -139,7 +144,9 @@ for modi in nqs:
 axs[0].legend(legends)
 axs[1].legend(legends)
 
-fig.savefig(PATH + '/pred_nq_cutoff.png')
+fig.suptitle('Influence of $N_q$ on quality of prediction (smaller range)', fontsize=20)
+
+fig.savefig(PATH + '/pred_nq_cutoff.png', format='png', dpi=440)
 ```
 
 # Influence of nr of configurations
@@ -171,7 +178,9 @@ for step in steps:
 axs[0].legend(legends)
 axs[1].legend(legends)
 
-fig.savefig(PATH + '/fit_nc.png')
+fig.suptitle('Influence of $N_{conf}$ on quality of fit', fontsize=20)
+
+fig.savefig(PATH + '/fit_nc.png', format='png', dpi=440)
 ```
 
 ```{python}
@@ -200,13 +209,14 @@ for step in steps:
 axs[0].legend(legends)
 axs[1].legend(legends)
 
-fig.savefig(PATH + '/fit_nc_cutoff.png')
+fig.suptitle('Influence of $N_{conf}$ on quality of fit (smaller range)', fontsize=20)
+
+fig.savefig(PATH + '/fit_nc_cutoff.png', format='png', dpi=440)
 ```
 
 ## Prediction
 
 ```{python}
-
 steps = [25, 50, 100, 150]
 
 legends = []
@@ -231,7 +241,9 @@ for step in steps:
 axs[0].legend(legends)
 axs[1].legend(legends)
 
-fig.savefig(PATH + '/pred_nc.png')
+fig.suptitle('Influence of $N_{conf}$ on quality of prediction', fontsize=20)
+
+fig.savefig(PATH + '/pred_nc.png', format='png', dpi=440)
 ```
 
 ```{python}
@@ -259,7 +271,44 @@ for step in steps:
 axs[0].legend(legends)
 axs[1].legend(legends)
 
-fig.savefig(PATH + '/pred_nc.png')
+fig.suptitle('Influence of $N_{conf}$ on quality of prediction (smaller range)', fontsize=20)
+
+fig.savefig(PATH + '/pred_nc.png', format='png', dpi=440)
+```
+
+```{python}
+nqs = [8, 14]
+
+legends = []
+fig, axs = plt.subplots(1, 3, figsize = (16, 6))
+titles = ["$\Delta F^ *$", "Var $\Delta F^ *$", "$\Delta E^*$"]
+axs[0].grid()
+axs[0].set_yscale('log')
+axs[0].set(xlabel="$\sigma$", ylabel=titles[0])
+
+axs[1].grid()
+axs[1].set_yscale('log')
+axs[1].set(xlabel="$\sigma$", ylabel=titles[1])
+
+axs[2].grid()
+axs[2].set_yscale('log')
+axs[2].set(xlabel="$\sigma$", ylabel=titles[1])
+
+for modi in nqs:
+    fit_path = f'fit_{20}_({float_to_str(0.0)}-{float_to_str(10.0)})_m{modi}_s{100}.dat'
+    fit = np.loadtxt(fit_path)
+
+    axs[0].scatter(fit[:, 0], fit[:, 1], s=20)
+    axs[1].scatter(fit[:, 0], fit[:, 2], s=20)
+    axs[2].scatter(fit[:, 0], fit[:, -1], s=20)
+    legends.append(f'$N_q=${modi}')
+
+axs[0].legend(legends)
+axs[1].legend(legends)
+
+
+fig.suptitle('Influence of $N_q$ on quality of fit (smaller range)', fontsize=20)
+fig.savefig(PATH + '/compare_big_small.png', format='png', dpi=440)
 ```
 
 ```{python}
