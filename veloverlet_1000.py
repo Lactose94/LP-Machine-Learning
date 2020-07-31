@@ -7,7 +7,7 @@ import numpy as np
 from configuration import Configuration
 import kernel
 
-# load the global parameters used in the machine-learning calibration -> globals object für mehr übersicht??? ===
+# load the global parameters used in the machine-learning calibration
 
 m_Si = 28.085 * 1.66 * 10**(-27) # kg
 kB = 1.38 * 10**(-33) # A^2 kg fs^-2 K^-1
@@ -108,7 +108,7 @@ def equilibrate(config, T, dt=0.01, doprint=False):
     # number Velocity-Verlet steps to equilibrate (only in tenths)
     t_0 = time()
 
-    steps = 100
+    steps = 1000
     for i in range(steps//10):
         if doprint:
             print(f'Equilibration in progress: {(i*1000)//steps} %', end='\r')
@@ -159,9 +159,18 @@ def veloverlet_10(dt, config0, nn_file=None):
 # Write the configuration's parameter to an already open (!) file
 def veloverlet_write(config, i, vv_file):
 
-    dim = np.shape(config.positions)[1]
+    n, dim = np.shape(config.positions)
+    T = (mass * np.sum(config.velocities**2)) / (3 * kB * (n-1))
+    E_kin = 1/2 * mass_ev * np.sum(config.velocities**2)
+    E_pot = config.energy
+    mean_vel = np.sqrt(np.mean(config.velocities**2)*dim)
 
     vv_file.write("***** Iteration block (" + str(i) + ") ***** \r\n" + "\r\n")
+
+    vv_file.write("temperature (K): " + "\r\n" + "     " + str(T) + "\r\n")
+    vv_file.write("kinetic energy (eV): " + "\r\n" + "     " + str(E_kin) + "\r\n")
+    vv_file.write("potential energy (eV): " + "\r\n" + "     " + str(E_pot) + "\r\n")
+    vv_file.write("total energy (eV): " + "\r\n" + "     " + str(E_kin + E_pot) + "\r\n" + "\r\n")
 
     vv_file.write("--------------- POSITIONS --------------- \r\n")
     vv_file.write(str(config.positions) + "\r\n" + "\r\n")
@@ -172,7 +181,8 @@ def veloverlet_write(config, i, vv_file):
 
     vv_file.write("--------------- VELOCITIES --------------- \r\n")
     vv_file.write(str(config.velocities) + "\r\n" + "\r\n")
-    vv_file.write("mean speed: " + "\r\n" + "     " + str(np.sqrt(np.mean(config.velocities**2)*dim)) + "\r\n" + "\r\n")
+    vv_file.write("mean speed: " + "\r\n" + "     " + str(mean_vel) + "\r\n")
+    vv_file.write("mean squared velocity: " + "\r\n" + "     " + str(mean_vel**2) + "\r\n" + "\r\n")
 
     vv_file.write("--------------- FORCES --------------- \r\n")
     vv_file.write(str(config.forces) + "\r\n" + "\r\n")
@@ -181,17 +191,17 @@ def veloverlet_write(config, i, vv_file):
     return
 
 
-def main(dt=0.01, steps=1000, doprint=False):
+def main(dt=1, steps=1000, doprint=False):
 
     # initialize the starting configuration
 
     ##### For random configuration: #####
-    #T = 1450 # targeted temperature for random velocities and equilibration in Kelvin
-    #config_0 = data_input_rand(T)
-    #config_0 = equilibrate(config_0, T, dt, doprint)
+    T = 1720 # targeted temperature for random velocities and equilibration in Kelvin, same T as in CONTCAR
+    config_0 = data_input_rand(T)
+    config_0 = equilibrate(config_0, T, dt, doprint)
 
     ##### Read in configuration: #####
-    config_0 = data_input_contcar()
+    #config_0 = data_input_contcar()
 
     # create (or overwrite if it exists) the nn_dist.out and vv.out file
     nn_file = open(directory + '/nn.out', 'w')
@@ -215,8 +225,8 @@ def main(dt=0.01, steps=1000, doprint=False):
 
 
 if __name__ == '__main__':
-    dt = 0.1
-    steps = 1000
+    dt = 1
+    steps = 10000
     doprint = True
     main(dt, steps, doprint)
 
