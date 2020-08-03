@@ -1,0 +1,9 @@
+{
+    "file_in": "OUTCAR.1687",
+    "file_out": "Gauss_hot",
+    "stepsize": 25,
+    "cutoff": 4,
+    "nr_modi": 8,
+    "lambda": 1e-12,
+    "kernel": ["gaussian", 16]
+}
