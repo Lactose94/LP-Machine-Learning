@@ -48,6 +48,7 @@ class Configuration(object):
     # Diese Funktion erstellt die descriptor coefficients der configuration.
     # Dafür muss ein float-Vektor q übergeben werden.
     # Dass dieser mit rcut zusammenpasst wird vorausgesetzt und nicht weiter überprüft.
+    ##### ##### Reference: Equation (1) ##### #####
     def init_descriptor(self, q):
         if self.nndistances is None:
             print("Execute Configuration.init_nn(rcut,lattice) before calculating descriptor coefficients!")
