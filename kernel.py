@@ -10,7 +10,8 @@ def linear_kernel(descr_list1: np.array, descr_list2: np.array) -> np.array:
         raise ValueError('cannot apply to float and array')
     elif (bool(shape1) ^ bool(shape2)) and not shape1[-1] == shape2[0]:
         raise ValueError(f'Shapes of input do not match: {np.shape(descr_list1)} vs {np.shape(descr_list2.T)}')
-
+    
+    ##### ##### Reference: Equation (12) ##### #####
     return np.matmul(descr_list1, descr_list2.T) # it says in the documentation that matmul is preferred over dot
 
 # descr_list1 ist die aktuelle Konfiguration, descr_list2 die Referenz-Konfiguration!
@@ -23,13 +24,15 @@ def gaussian_kernel(descr_list1: np.array, descr_list2: np.array, sigma: float) 
     abs2 = np.sum(descr_list2 ** 2, axis=1)
 
     coeffs = linear_kernel(descr_list1, descr_list2)
-
+    
+    ##### ##### Reference: Equation (13) ##### #####
     dr = abs1.reshape(nbnj, 1) - 2 * coeffs + abs2.reshape(1, nani)
 
     return np.exp(-dr / (2 * sigma**2))
 
 
 # builds part of the row for the force kernel matrix given a configuration and a set of descriptors
+##### ##### Reference: Equation (16) ##### #####
 def linear_force_submat(q: np.array, config1: configuration, descriptors_array: np.array) -> np.array:
     '''
     Given one configuration and a set of descriptors, calculates the T-matrix, needed for the forces.
@@ -58,6 +61,7 @@ def linear_force_submat(q: np.array, config1: configuration, descriptors_array: 
 
 
 # builds part of the row for the force kernel matrix given a configuration and a set of descriptors
+##### ##### Reference: Equation (21) ##### #####
 def gaussian_force_mat(q: np.array, config1: configuration, descriptors_array: np.array, sigma: float) -> np.array:
     nq = len(q)
     nj, modi_config = np.shape(config1.descriptors)
