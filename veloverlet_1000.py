@@ -40,6 +40,7 @@ def predict_forces(config: Configuration):
     T = kern.force_submat(q, config, C_cal)
 
     # solve the linear system
+    ##### ##### Reference: Equation (22) ##### #####
     EF = np.matmul(np.append(K,T, axis=0),w_cal)
 
     config.energy = EF[0] + E_ave
@@ -57,6 +58,7 @@ def data_input_rand(T):
     positions = np.random.rand(64,3) * a
 
     # random velocities, gaussian distribution at temperature T (= boltzmann distribution for speed)
+    ##### ##### Reference: Equation (35) ##### #####
     sigma_xyz = np.sqrt(63/64 * kB/mass * T) # A/fs
     velocities = np.random.normal(0, sigma_xyz, (64,3))
     for i in range(0,3):
@@ -114,7 +116,8 @@ def equilibrate(config, T, dt=0.01, doprint=False):
             print(f'Equilibration in progress: {(i*1000)//steps} %', end='\r')
 
         config = veloverlet_10(dt, config)
-
+        
+        ##### ##### Reference: Equation (35) ##### #####
         sig_theo = np.sqrt(63/64 * kB/mass * T) # theoretical variance
         sig_real = np.sqrt(pvariance(config.velocities.flatten(), 0)) # sample variance with known mean 0
         factor = sig_theo/sig_real # Normal distribution scales as: sig*N(0,x) = N(0,sig*x)
@@ -132,6 +135,7 @@ def veloverlet_10(dt, config0, nn_file=None):
     # perform 10 steps at once to minimize correlations (now for testing purposes only 1 step)
     for i in range(10):
         # Velocity-Verlet algorithm: positions
+        ##### ##### Reference: Equation (27) ##### #####
         pos1 = config0.positions + config0.velocities * dt + config0.forces/(2*mass_ev) * dt**2
         pos1 = (pos1 % a + a) % a # periodic boundary conditions
         # print(pos1)
@@ -139,6 +143,7 @@ def veloverlet_10(dt, config0, nn_file=None):
         # Machine learned: forces
         config1 = predict_forces(config1)
         # Velocity-Verlet algorithm: velocities
+        ##### ##### Reference: Equation (28) ##### #####
         config1.velocities = config0.velocities + (config0.forces + config1.forces)/(2*mass_ev) * dt
 
         #print(id(config0), id(config1))
