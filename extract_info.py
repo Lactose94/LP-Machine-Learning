@@ -1,5 +1,5 @@
-directory = "Lin_data_rand"
-header = "Linear Kernel with random starting conditions"
+directory = "Gauss_hot"
+header = "Gaussian Kernel at high T with OUTCAR starting conditions"
 
 def main():
     

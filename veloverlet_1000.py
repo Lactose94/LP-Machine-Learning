@@ -196,12 +196,12 @@ def main(dt=1, steps=1000, doprint=False):
     # initialize the starting configuration
 
     ##### For random configuration: #####
-    T = 1720 # targeted temperature for random velocities and equilibration in Kelvin, same T as in CONTCAR
-    config_0 = data_input_rand(T)
-    config_0 = equilibrate(config_0, T, dt, doprint)
+    #T = 1720 # targeted temperature for random velocities and equilibration in Kelvin, same T as in CONTCAR
+    #config_0 = data_input_rand(T)
+    #config_0 = equilibrate(config_0, T, dt, doprint)
 
     ##### Read in configuration: #####
-    #config_0 = data_input_contcar()
+    config_0 = data_input_contcar()
 
     # create (or overwrite if it exists) the nn_dist.out and vv.out file
     nn_file = open(directory + '/nn.out', 'w')

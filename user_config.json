@@ -1,9 +1,9 @@
 {
     "file_in": "OUTCAR.21",
-    "file_out": "test_data",
-    "stepsize": 50,
+    "file_out": "Gaussian_data",
+    "stepsize": 25,
     "cutoff": 4,
-    "nr_modi": 10,
-    "lambda": 1e-3,
-    "kernel": ["gaussian", 6]
+    "nr_modi": 8,
+    "lambda": 1e-12,
+    "kernel": ["gaussian", 16]
 }
