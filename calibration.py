@@ -87,7 +87,7 @@ def build_linear(u_conf: dict, configurations: list, C: np.array, q: np.array) -
 
     return (E, F, K, T)
 
-
+##### ##### Reference: Equation (24) ##### #####
 def ridge_regression(K, E, lamb):
     X = np.matmul(np.transpose(K), K)
     y = np.matmul(np.transpose(K), E)
