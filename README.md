@@ -1,5 +1,6 @@
 # LP-Machine-Learning
 Laborpraktikum Machine Learning ML_LiqiudSI.
+The mathematical documentation can be found [here](https://www.overleaf.com/read/ngnfchvjrtrq). 
 ## outcar_parser:
 The purpose of the parser is to handle loading and processing of the outcar file. It allows to read number of ions, direct lattice vectors, as well as positions, forces and energies.
 
@@ -122,7 +123,7 @@ The program takes as command line parameter the name of a json-file, which conta
 ### Functions:
 - **`load_data(u_conf: dict, offset=0) ->  (int, int, np.array, list):`** Loads the data from the file specified in u_conf (where u_conf should contain the values of the given json-file) and returns the parameters of the simulation as (N_conf, N_ion, lattice vectors, list of configurations). The offset is given to the outcar_parser as before.
 - **`init_configurations(u_conf: dict, configurations: list, q: np.array, C: np.array):`** Initializes the nearest neighbors and descriptors. Writes values for the descriptors into the C array. Choosen this way, to only have sideeffects and no return. Takes as input the the values of the json file, a list of configurations, the q-vector and an array for the descriptors, which will be overwritten with the descriptors. 
-- **`build_linear(u_conf: dict, configurations: list, C: np.array, q: np.array) -> (np.array, np.array, np.array, np.array):`** Intializes the kernel and then builds the linear system as in equation (??) with the kernel matrices according to the kernel choosen in u_conf. Already normalizes the data to <E> = 0.  
+- **`build_linear(u_conf: dict, configurations: list, C: np.array, q: np.array) -> (np.array, np.array, np.array, np.array):`** Intializes the kernel and then builds the linear system as in equation (??) with the kernel matrices according to the kernel choosen in u_conf. Already normalizes the data to \<E\> = 0.  
   Takes as input the values of the json file, a list of configurations used to set up the linear system, the descriptors calculated from those configurations and the q-vector.
 - **`def ridge_regression(K, E, lamb):`** Performs the ridge regression on the matrix K, given the data E, with ridge parameter lamb as in equation (??).
 - **`main():`** Loads the json file and runs the above functions in the correct order, to read the training data, initialize the configurations, build  the linear system, solve the linear system and save the result in the correct folder.
