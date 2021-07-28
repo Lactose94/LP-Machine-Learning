@@ -13,7 +13,7 @@ m_Si = 28.085 * 1.66 * 10**(-27) # kg
 kB = 1.38 * 10**(-33) # A^2 kg fs^-2 K^-1
 eV = 1.602177 * 10**(-19) # J/eV
 
-a = 10.546640000 # lattice constant in A
+a = 10.546640000 # lattice constant in A - MUST BE SMALLER THAN THE LATTICE CONSTANT OF THE CONCAR FILE (when using a VASP simulation for the initial state)
 mass = m_Si # We have Silicon
 mass_ev = mass * 10**(2*15-2*10) / eV # eV fs^2 A^-2
 
@@ -137,7 +137,7 @@ def veloverlet_10(dt, config0, nn_file=None):
         # Velocity-Verlet algorithm: positions
         ##### ##### Reference: Equation (27) ##### #####
         pos1 = config0.positions + config0.velocities * dt + config0.forces/(2*mass_ev) * dt**2
-        pos1 = (pos1 % a + a) % a # periodic boundary conditions
+        pos1 = (pos1 % a + a) % a # periodic boundary conditions 
         # print(pos1)
         config1 = Configuration(pos1)
         # Machine learned: forces
